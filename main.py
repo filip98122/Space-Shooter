@@ -43,7 +43,7 @@ class Player:
         s.time=time
         s.speed = speed
         s.health = 3
-        s.scale = 0.3
+        s.scale = 0.3*0.75
         if s.health ==3:
             s.img = pygame.image.load('full.png')
         if s.health==2:
@@ -58,12 +58,43 @@ class Player:
         window.blit(self.scaled_img,(self.x,self.y))
     def move(s,keys):
         s.dx = 0
-        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-            s.dx = -s.speed
-        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-            s.dx = s.speed
+        if s.x>=2:
+            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+                s.dx = -s.speed
+        if s.x+s.width<763:
+            if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+                s.dx = s.speed
         s.x+=s.dx
-p1 = Player(100,550,0,0,4)
+        if s.time>0:
+            s.time-=1
+
+
+
+
+
+class Laser:
+    def __init__(self,x,health):
+        self.x = x
+        self.y = 510
+        self.health = health
+        self.dy = -7
+        self.scale = 0.3*0.75
+        self.img = pygame.image.load('laser.png')
+        self.width = self.img.get_width()*self.scale
+        self.height = self.img.get_height()*self.scale
+        self.scaled_img = pygame.transform.scale(self.img, (self.width, self.height))
+    def draw(s,window):
+        if s.health == 1:
+            if s.y <= -53*0.75:
+                s.health = 0
+            s.y+=s.dy
+            window.blit(s.scaled_img,(s.x,s.y))
+        
+l_l = []
+
+
+
+p1 = Player(100,550,0,0,6)
         
         
 while True:
@@ -77,7 +108,32 @@ while True:
             exit()
     if keys[pygame.K_ESCAPE]:
         exit()
-    p1.move(keys)
+    if keys[pygame.K_SPACE]:
+        if p1.time == 0:
+            p1.time = 20
+            if len(l_l) == 40:
+                for i in range(len(l_l)):
+                    if l_l[i].health == 0:
+                        if p1.health == 2 or p1.health == 3:
+                            l_l[i] = Laser(p1.x+78*0.75,1)
+                        else:
+                            l_l[i] = Laser(p1.x+49*0.75,1)
+            else:
+                if p1.health == 2 or p1.health == 3:
+                    l1 = Laser(p1.x+78*0.75,1)
+                else:
+                    l1 = Laser(p1.x+49*0.75,1)
+                l_l.append(l1)
+    for i in range(len(l_l)):
+        if l_l[i].health != 0:
+            l_l[i].draw(window)
+    q = 0
+    for i in range(len(l_l)):
+        if l_l[q].health == 0:
+            del l_l[q]
+            q-=1
+        q+=1
     p1.draw(window)
+    p1.move(keys)
     pygame.display.update()
     clock.tick(60)
