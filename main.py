@@ -35,12 +35,40 @@ def button_colision(width,height,x,y,mousePos,mouseState):
     else:
         return False
 
+class Background:
+    def __init__(s,x,speedy):
+        s.x = x
+        s.y = 0
+        s.scale = 9
+        s.speedy = speedy
+        s.d = random.randint(1,5)
+        if s.d == 1:
+            s.image = pygame.image.load('star1.png')
+            s.width = s.image.get_width()/2.1
+            s.height = s.image.get_height()/2.1
+            s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
+        if s.d >= 3:
+            s.image = pygame.image.load('star3.png')
+            s.width = s.image.get_width()
+            s.height = s.image.get_height()
+            s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
+        if s.d == 2:
+            s.image = pygame.image.load('star2.png')
+            s.width = s.image.get_width()/1.8
+            s.height = s.image.get_height()/1.8
+            s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
+    def move_and_draw(s,window):
+        s.y+=s.speedy
+        window.blit(s.scaled_img,(s.x,s.y))
+l_b = []
 class Player:
     def __init__(s,x,y,dx,time,speed):
         s.x =x
         s.y=y
         s.dx=dx
         s.time=time
+        s.cant_go_left = False
+        s.cant_go_right = False
         s.speed = speed
         s.health = 3
         s.scale = 0.3*0.75
@@ -58,18 +86,41 @@ class Player:
         window.blit(self.scaled_img,(self.x,self.y))
     def move(s,keys):
         s.dx = 0
+        s.cant_go_left = False
+        s.cant_go_right = False
         if s.x>=2:
             if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-                s.dx = -s.speed
+                if keys[pygame.K_d] == False or keys[pygame.K_RIGHT] == False:
+                    s.dx = -s.speed
+        else:
+            s.cant_go_left = True
         if s.x+s.width<763:
             if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-                s.dx = s.speed
+                if s.dx == 0:
+                    s.dx = s.speed
+        else:
+            s.cant_go_right = True
         s.x+=s.dx
         if s.time>0:
             s.time-=1
 
 
 
+class Asteroid:
+    def __init__(s,x,y):
+        s.x = x
+        s.y = y
+        s.img_choice = random.randint(1,4)
+        if s.img_choice == 1:
+            s.image = pygame.image.load("asteroid1")
+        if s.img_choice == 2:
+            s.image = pygame.image.load("asteroid2")
+        if s.img_choice == 3:
+            s.image = pygame.image.load("asteroid3")
+        if s.img_choice == 4:
+            s.image = pygame.image.load("asteroid4")
+        s.height = s.image.get_height()
+        s.width = s.image.get_width()
 
 
 class Laser:
@@ -98,7 +149,14 @@ p1 = Player(100,550,0,0,6)
         
         
 while True:
+    e = random.randint(1,20)
+    if e == 1:
+        w = random.randint(2,5)
+        e = random.randint(10,728)
+        l_b.append(Background(e,w))
     window.fill("Black")
+    for i in range(len(l_b)):
+        l_b[i].move_and_draw(window)
     keys = pygame.key.get_pressed()
     events = pygame.event.get()
     mouseState = pygame.mouse.get_pressed()
@@ -133,6 +191,12 @@ while True:
             del l_l[q]
             q-=1
         q+=1
+    r = 0
+    for i in range(len(l_b)):
+        if l_b[r].y >= 765:
+            del l_b[r]
+            r-=1
+        r+=1
     p1.draw(window)
     p1.move(keys)
     pygame.display.update()
