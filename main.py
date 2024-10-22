@@ -110,19 +110,26 @@ class Asteroid:
     def __init__(s,x,y):
         s.x = x
         s.y = y
+        s.alive = True
         s.img_choice = random.randint(1,4)
+        s.speed = random.randint(2,5)
         if s.img_choice == 1:
-            s.image = pygame.image.load("asteroid1")
+            s.image = pygame.image.load("asteroid1.png")
         if s.img_choice == 2:
-            s.image = pygame.image.load("asteroid2")
+            s.image = pygame.image.load("asteroid2.png")
         if s.img_choice == 3:
-            s.image = pygame.image.load("asteroid3")
+            s.image = pygame.image.load("asteroid3.png")
         if s.img_choice == 4:
-            s.image = pygame.image.load("asteroid4")
-        s.height = s.image.get_height()
-        s.width = s.image.get_width()
-
-
+            s.image = pygame.image.load("asteroid4.png")
+        
+        s.height = s.image.get_height()*2
+        s.width = s.image.get_width()*2
+        s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
+    def draw(s,window):
+        if s.alive == True:
+            window.blit(s.scaled_img,(s.x,s.y))
+            s.y+=s.speed
+l_a = []
 class Laser:
     def __init__(self,x,health):
         self.x = x
@@ -149,6 +156,10 @@ p1 = Player(100,550,0,0,6)
         
         
 while True:
+    a_r = random.randint(1,65)
+    if a_r == 1:
+        ast = Asteroid(random.randint(25,700),-70)
+        l_a.append(ast)
     e = random.randint(1,20)
     if e == 1:
         w = random.randint(2,5)
@@ -166,6 +177,18 @@ while True:
             exit()
     if keys[pygame.K_ESCAPE]:
         exit()
+    if p1.health==0:
+        exit()
+        
+    #laser
+    q = 0
+    for i in range(len(l_l)):
+        if l_l[q].health == 0:
+            del l_l[q]
+            q-=1
+        q+=1
+    r = 0
+    
     if keys[pygame.K_SPACE]:
         if p1.time == 0:
             p1.time = 20
@@ -185,18 +208,49 @@ while True:
     for i in range(len(l_l)):
         if l_l[i].health != 0:
             l_l[i].draw(window)
-    q = 0
-    for i in range(len(l_l)):
-        if l_l[q].health == 0:
-            del l_l[q]
-            q-=1
-        q+=1
-    r = 0
+
+    
+    #background
+    
     for i in range(len(l_b)):
         if l_b[r].y >= 765:
             del l_b[r]
             r-=1
         r+=1
+    
+    #asteroids
+    for i in range(len(l_a)):
+        l_a[i].draw(window)
+    r = 0
+    for i in range(len(l_a)):
+        if l_a[r].y >= 765:
+            del l_a[r]
+            r-=1
+        r+=1
+        
+    err = 0
+    for i in range(len(l_a)):
+        if colision1(pygame.Rect(p1.x,p1.y,p1.width,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+            p1.health-=1
+            if p1.health==2:
+                p1.img = pygame.image.load('damaged1.png')
+            if p1.health==1:
+                p1.img = pygame.image.load('damaged2.png')
+            del l_a[err]
+            err-=1
+        err+=1
+    
+    for i in range(len(l_l)):
+        for j in range(len(l_a)):
+            if colision1(pygame.Rect(l_l[i].x,l_l[i].y,l_l[i].width,l_l[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):
+                l_l[i].health-=1
+                l_a[j].alive = False
+    err = 0
+    for i in range(len(l_a)):
+        if l_a[err].alive == False:
+            del l_a[err]
+            err-=1
+        err+=1
     p1.draw(window)
     p1.move(keys)
     pygame.display.update()
