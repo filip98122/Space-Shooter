@@ -105,12 +105,29 @@ class Player:
             s.time-=1
 
 
-
+class Minerl:
+    def __init__(s,x,y,dy):
+        s.x = x
+        s.y = y
+        s.alive = True
+        s.dy = dy
+        s.img = pygame.image.load("mineral.png")
+        s.width = s.img.get_width()-15
+        s.height = s.img.get_height()-15
+        s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))
+    def move_and_draw(s,window):
+        if s.alive == True:
+            s.y+=s.dy
+            window.blit(s.scaled_img,(s.x,s.y))
+            if s.x >= 770:
+                s.alive = False
+        
 class Asteroid:
     def __init__(s,x,y):
         s.x = x
         s.y = y
         s.alive = True
+        s.Time_from_death = 70
         s.img_choice = random.randint(1,4)
         s.speed = random.randint(2,5)
         if s.img_choice == 1:
@@ -121,6 +138,7 @@ class Asteroid:
             s.image = pygame.image.load("asteroid3.png")
         if s.img_choice == 4:
             s.image = pygame.image.load("asteroid4.png")
+            
         
         s.height = s.image.get_height()*2
         s.width = s.image.get_width()*2
@@ -129,6 +147,27 @@ class Asteroid:
         if s.alive == True:
             window.blit(s.scaled_img,(s.x,s.y))
             s.y+=s.speed
+        else:
+            if s.Time_from_death>60:
+                s.img = pygame.image.load("explosion.png")
+            elif s.Time_from_death>50:
+                s.img = pygame.image.load("explosion1.png")
+            elif s.Time_from_death>40:
+                s.img = pygame.image.load("explosion2.png")
+            elif s.Time_from_death>30:
+                s.img = pygame.image.load("explosion3.png")
+            elif s.Time_from_death>20:
+                s.img = pygame.image.load("explosion4.png")
+            elif s.Time_from_death>10:
+                s.img = pygame.image.load("explosion5.png")
+            elif s.Time_from_death>0:
+                s.img = pygame.image.load("explosion6.png")
+
+            s.height1 = s.image.get_height()+20
+            s.width1 = s.image.get_width()+20
+            s.scaled_img1 = pygame.transform.scale(s.img, (s.width1, s.height1))
+            window.blit(s.scaled_img1,(s.x,s.y))
+        
 l_a = []
 class Laser:
     def __init__(self,x,health):
@@ -156,7 +195,7 @@ p1 = Player(100,550,0,0,6)
         
         
 while True:
-    a_r = random.randint(1,65)
+    a_r = random.randint(1,45)
     if a_r == 1:
         ast = Asteroid(random.randint(25,700),-70)
         l_a.append(ast)
@@ -243,14 +282,18 @@ while True:
     for i in range(len(l_l)):
         for j in range(len(l_a)):
             if colision1(pygame.Rect(l_l[i].x,l_l[i].y,l_l[i].width,l_l[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):
-                l_l[i].health-=1
-                l_a[j].alive = False
+                if l_a[j].alive == True:
+                    l_l[i].health-=1
+                    l_a[j].alive = False
     err = 0
     for i in range(len(l_a)):
-        if l_a[err].alive == False:
+        if l_a[err].Time_from_death == 0:
             del l_a[err]
             err-=1
         err+=1
+    for i in range(len(l_a)):
+        if l_a[i].alive == False:
+            l_a[i].Time_from_death-=1
     p1.draw(window)
     p1.move(keys)
     pygame.display.update()
