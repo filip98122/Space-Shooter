@@ -4,6 +4,8 @@ import random
 import math
 import time
 import json
+pygame.init()
+pygame.mixer.init()
 def collison(x1,y1,r1,x2,y2,r2):
     dx = x2 - x1
     dy = y2 - y1
@@ -112,16 +114,16 @@ class Minerl:
         s.alive = True
         s.dy = dy
         s.img = pygame.image.load("mineral.png")
-        s.width = s.img.get_width()-15
-        s.height = s.img.get_height()-15
+        s.width = 30
+        s.height = 30
         s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))
     def move_and_draw(s,window):
         if s.alive == True:
             s.y+=s.dy
             window.blit(s.scaled_img,(s.x,s.y))
-            if s.x >= 770:
+            if s.y >= 770:
                 s.alive = False
-        
+l_m = []
 class Asteroid:
     def __init__(s,x,y):
         s.x = x
@@ -204,8 +206,19 @@ l_l = []
 
 
 p1 = Player(100,550,0,0,6)
-        
-        
+
+def draw_minerals(x,y,window,minerala):
+    img = pygame.image.load("mineral.png")
+    width = 30
+    height = 30
+    scaled_img = pygame.transform.scale(img, (width, height))
+    window.blit(scaled_img,(x,y))
+    myfont = pygame.font.SysFont('B', 45)
+    text_surface = myfont.render(f"{minerala}", True, (255, 255, 255))
+    window.blit(text_surface,(x+55,y))
+
+ 
+minerala = 0
 while True:
     a_r = random.randint(1,45)
     if a_r == 1:
@@ -230,6 +243,9 @@ while True:
         exit()
     if p1.health==0:
         exit()
+    draw_minerals(25,25,window,minerala)   
+    
+    
         
     #laser
     q = 0
@@ -289,8 +305,7 @@ while True:
                 p1.img = pygame.image.load('damaged2.png')
             del l_a[err]
             err-=1
-        err+=1
-    
+        err +=1
     for i in range(len(l_l)):
         for j in range(len(l_a)):
             if colision1(pygame.Rect(l_l[i].x,l_l[i].y,l_l[i].width,l_l[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):
@@ -298,8 +313,10 @@ while True:
                     l_l[i].health-=1
                     l_a[j].alive = False
     err = 0
-    for i in range(len(l_a)):
+    for i in range(len(l_a)):   
         if l_a[err].alive == False:
+            m = Minerl(l_a[err].x,l_a[err].y,2.5)
+            l_m.append(m)
             for i in range(5):
                 timeSpread = i*5
                 scalespread = 1.8-(i/10)*2
@@ -308,7 +325,7 @@ while True:
             del l_a[err]
             err-=1
         err+=1
-        
+    
     err = 0
     for i in range(len(l_e)):
         l_e[i].draw(window)
@@ -317,6 +334,26 @@ while True:
             del l_e[err]
             err-=1
         err+=1
+    for i in range(len(l_m)):
+        l_m[i].move_and_draw(window)
+    err = 0
+    for i in range(len(l_m)):
+        if l_m[err].alive == False:
+            del l_m[err]
+            err-=1
+        err+=1
+    for i in range(len(l_m)):
+        if colision1(pygame.Rect(l_m[i].x,l_m[i].y,l_m[i].width,l_m[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
+            minerala +=1
+            l_m[i].alive = False
+            
+    err = 0
+    for i in range(len(l_m)):
+        if l_m[err].alive == False:
+            del l_m[err]
+            err-=1
+        err+=1
+        
     p1.draw(window)
     p1.move(keys)
     pygame.display.update()
