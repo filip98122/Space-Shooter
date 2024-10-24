@@ -147,28 +147,40 @@ class Asteroid:
         if s.alive == True:
             window.blit(s.scaled_img,(s.x,s.y))
             s.y+=s.speed
-        else:
-            if s.Time_from_death>60:
-                s.img = pygame.image.load("explosion.png")
-            elif s.Time_from_death>50:
-                s.img = pygame.image.load("explosion1.png")
-            elif s.Time_from_death>40:
-                s.img = pygame.image.load("explosion2.png")
-            elif s.Time_from_death>30:
-                s.img = pygame.image.load("explosion3.png")
-            elif s.Time_from_death>20:
-                s.img = pygame.image.load("explosion4.png")
-            elif s.Time_from_death>10:
-                s.img = pygame.image.load("explosion5.png")
-            elif s.Time_from_death>0:
-                s.img = pygame.image.load("explosion6.png")
 
-            s.height1 = s.image.get_height()+20
-            s.width1 = s.image.get_width()+20
-            s.scaled_img1 = pygame.transform.scale(s.img, (s.width1, s.height1))
-            window.blit(s.scaled_img1,(s.x,s.y))
-        
+
+
+
+
+
 l_a = []
+l_e = []
+class Explosion:
+    def __init__(s,x,y,w,h,time,ss):
+        s.x= x
+        s.y = y
+        s.w = w
+        s.h = h
+        s.width1 = s.w
+        s.height1 = s.h
+        s.t = time
+        s.Time_from_death = 0
+        s.ss = ss
+    def draw(s,window):
+        s.width1 = s.h
+        s.height1 = s.h
+        # Filip big-brain implementation
+        s.img = pygame.image.load(f"explosion{s.Time_from_death//5}.png")
+        s.width1*=s.ss
+        s.height1*=s.ss
+        s.scaled_img1 = pygame.transform.scale(s.img, (s.width1, s.height1))
+        if s.t==0:
+            window.blit(s.scaled_img1,(s.x,s.y))
+        if s.t == 0:
+            s.Time_from_death+=1
+        else:
+            s.t-=1
+    
 class Laser:
     def __init__(self,x,health):
         self.x = x
@@ -287,13 +299,24 @@ while True:
                     l_a[j].alive = False
     err = 0
     for i in range(len(l_a)):
-        if l_a[err].Time_from_death == 0:
+        if l_a[err].alive == False:
+            for i in range(5):
+                timeSpread = i*5
+                scalespread = 1.8-(i/10)*2
+                e = Explosion(random.randint(l_a[err].x-30,l_a[err].x+l_a[err].width-10),random.randint(l_a[err].y-30,l_a[err].y+l_a[err].height-10),l_a[err].width,l_a[err].height,timeSpread,scalespread)
+                l_e.append(e)
             del l_a[err]
             err-=1
         err+=1
-    for i in range(len(l_a)):
-        if l_a[i].alive == False:
-            l_a[i].Time_from_death-=1
+        
+    err = 0
+    for i in range(len(l_e)):
+        l_e[i].draw(window)
+    for i in range(len(l_e)):
+        if l_e[err].Time_from_death == 35:
+            del l_e[err]
+            err-=1
+        err+=1
     p1.draw(window)
     p1.move(keys)
     pygame.display.update()
