@@ -217,10 +217,10 @@ def draw_minerals(x,y,window,minerala):
     text_surface = myfont.render(f"{minerala}", True, (255, 255, 255))
     window.blit(text_surface,(x+55,y))
 
- 
+minerala_ukupno = 0
 minerala = 0
 while True:
-    a_r = random.randint(1,45)
+    a_r = random.randint(1,10)
     if a_r == 1:
         ast = Asteroid(random.randint(25,700),-70)
         l_a.append(ast)
@@ -278,7 +278,14 @@ while True:
 
     
     #background
-    
+    if keys[pygame.K_h]:
+        if minerala>=35:
+            if p1.health!=3:
+                p1.health+=1
+                if p1.health==2:
+                    p1.img = pygame.image.load('damaged1.png')
+                if p1.health==3:
+                    p1.img = pygame.image.load('full.png')
     for i in range(len(l_b)):
         if l_b[r].y >= 765:
             del l_b[r]
@@ -345,6 +352,7 @@ while True:
     for i in range(len(l_m)):
         if colision1(pygame.Rect(l_m[i].x,l_m[i].y,l_m[i].width,l_m[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
             minerala +=1
+            minerala_ukupno +=1
             l_m[i].alive = False
             
     err = 0
