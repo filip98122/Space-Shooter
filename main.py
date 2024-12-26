@@ -73,19 +73,44 @@ class Player:
         s.cant_go_right = False
         s.speed = speed
         s.health = 3
-        s.scale = 0.3*0.75
-        if s.health ==3:
-            s.img = pygame.image.load('full.png')
-        if s.health==2:
-            s.img = pygame.image.load('damaged1.png')
-        if s.health==1:
-            s.img = pygame.image.load('damaged2.png')
-    def draw(self,window):
+        s.scale = 0.225
         
-        self.width = self.img.get_width()*self.scale
-        self.height = self.img.get_height()*self.scale
-        self.scaled_img = pygame.transform.scale(self.img, (self.width, self.height))
-        window.blit(self.scaled_img,(self.x,self.y))
+        
+        
+        
+        s.img = pygame.image.load('1.png')
+        s.width = s.img.get_width()*s.scale
+        s.height = s.img.get_height()*s.scale
+        e=pygame.transform.scale(s.img, (s.width, s.height))
+        
+        
+        s.img = pygame.image.load('2.png')
+        s.width = s.img.get_width()*s.scale
+        s.height = s.img.get_height()*s.scale
+        w=pygame.transform.scale(s.img, (s.width, s.height))
+        
+        
+        
+        s.img = pygame.image.load('3.png')
+        s.width = s.img.get_width()*s.scale
+        s.height = s.img.get_height()*s.scale
+        q=pygame.transform.scale(s.img, (s.width, s.height))
+        
+        s.dict={
+            3:q,
+            2:w,
+            1:e 
+        }
+        
+
+        
+    def draw(self,window):
+        if self.health==0:
+            return
+        else:
+            self.width=self.dict[self.health].get_width()
+            self.height=self.dict[self.health].get_height()
+            window.blit(self.dict[self.health],(self.x,self.y))
     def move(s,keys):
         s.dx = 0
         s.cant_go_left = False
@@ -107,7 +132,7 @@ class Player:
             s.time-=1
 
 
-class Minerl:
+class Mineral:
     def __init__(s,x,y,dy):
         s.x = x
         s.y = y
@@ -128,6 +153,7 @@ class Asteroid:
     def __init__(s,x,y):
         s.x = x
         s.y = y
+        s.drop=True
         s.alive = True
         s.Time_from_death = 70
         s.img_choice = random.randint(1,4)
@@ -219,150 +245,173 @@ def draw_minerals(x,y,window,minerala):
 
 minerala_ukupno = 0
 minerala = 0
+prozor=1
 while True:
-    a_r = random.randint(1,10)
-    if a_r == 1:
-        ast = Asteroid(random.randint(25,700),-70)
-        l_a.append(ast)
-    e = random.randint(1,20)
-    if e == 1:
-        w = random.randint(2,5)
-        e = random.randint(10,728)
-        l_b.append(Background(e,w))
-    window.fill("Black")
-    for i in range(len(l_b)):
-        l_b[i].move_and_draw(window)
-    keys = pygame.key.get_pressed()
-    events = pygame.event.get()
-    mouseState = pygame.mouse.get_pressed()
-    mousePos = pygame.mouse.get_pos()
-    for event in events:
-        if event.type == pygame.QUIT:
+    if prozor==0:
+        keys = pygame.key.get_pressed()
+        events = pygame.event.get()
+        mouseState = pygame.mouse.get_pressed()
+        mousePos = pygame.mouse.get_pos()
+        for event in events:
+            if event.type == pygame.QUIT:
+                exit()
+        if keys[pygame.K_ESCAPE]:
             exit()
-    if keys[pygame.K_ESCAPE]:
-        exit()
-    if p1.health==0:
-        exit()
-    draw_minerals(25,25,window,minerala)   
-    
-    
+        e = random.randint(1,10)
+        if e == 1:
+            w = random.randint(2,5)
+            e = random.randint(10,728)
+            l_b.append(Background(e,w))
+        window.fill("Black")
+        for i in range(len(l_b)):
+            l_b[i].move_and_draw(window)
         
-    #laser
-    q = 0
-    for i in range(len(l_l)):
-        if l_l[q].health == 0:
-            del l_l[q]
-            q-=1
-        q+=1
-    r = 0
-    
-    if keys[pygame.K_SPACE]:
-        if p1.time == 0:
-            p1.time = 20
-            if len(l_l) == 40:
-                for i in range(len(l_l)):
-                    if l_l[i].health == 0:
-                        if p1.health == 2 or p1.health == 3:
-                            l_l[i] = Laser(p1.x+78*0.75,1)
-                        else:
-                            l_l[i] = Laser(p1.x+49*0.75,1)
-            else:
-                if p1.health == 2 or p1.health == 3:
-                    l1 = Laser(p1.x+78*0.75,1)
-                else:
-                    l1 = Laser(p1.x+49*0.75,1)
-                l_l.append(l1)
-    for i in range(len(l_l)):
-        if l_l[i].health != 0:
-            l_l[i].draw(window)
-
-    
-    #background
-    if keys[pygame.K_h]:
-        if minerala>=35:
-            if p1.health!=3:
-                p1.health+=1
-                if p1.health==2:
-                    p1.img = pygame.image.load('damaged1.png')
-                if p1.health==3:
-                    p1.img = pygame.image.load('full.png')
-    for i in range(len(l_b)):
-        if l_b[r].y >= 765:
-            del l_b[r]
-            r-=1
-        r+=1
-    
-    #asteroids
-    for i in range(len(l_a)):
-        l_a[i].draw(window)
-    r = 0
-    for i in range(len(l_a)):
-        if l_a[r].y >= 765:
-            del l_a[r]
-            r-=1
-        r+=1
+    #GAME CODE IS BELOW |||||||||||||||||||
+    #GAME CODE IS BELOW |||||||||||||||||||
+    #GAME CODE IS BELOW |||||||||||||||||||
+    #GAME CODE IS BELOW |||||||||||||||||||
+    #GAME CODE IS BELOW |||||||||||||||||||
+    #GAME CODE IS BELOW |||||||||||||||||||
+    if prozor==1:
+        a_r = random.randint(1,10)
+        if a_r == 1:
+            ast = Asteroid(random.randint(25,700),-70)
+            l_a.append(ast)
+        e = random.randint(1,20)
+        if e == 1:
+            w = random.randint(2,5)
+            e = random.randint(10,728)
+            l_b.append(Background(e,w))
+        window.fill("Black")
+        for i in range(len(l_b)):
+            l_b[i].move_and_draw(window)
+        keys = pygame.key.get_pressed()
+        events = pygame.event.get()
+        mouseState = pygame.mouse.get_pressed()
+        mousePos = pygame.mouse.get_pos()
+        for event in events:
+            if event.type == pygame.QUIT:
+                exit()
+        if keys[pygame.K_ESCAPE]:
+            exit()
+        if p1.health==0:
+            exit()
+        draw_minerals(25,25,window,minerala)
         
-    err = 0
-    for i in range(len(l_a)):
-        if colision1(pygame.Rect(p1.x,p1.y,p1.width,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
-            p1.health-=1
-            if p1.health==2:
-                p1.img = pygame.image.load('damaged1.png')
-            if p1.health==1:
-                p1.img = pygame.image.load('damaged2.png')
-            del l_a[err]
-            err-=1
-        err +=1
-    for i in range(len(l_l)):
-        for j in range(len(l_a)):
-            if colision1(pygame.Rect(l_l[i].x,l_l[i].y,l_l[i].width,l_l[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):
-                if l_a[j].alive == True:
-                    l_l[i].health-=1
-                    l_a[j].alive = False
-    err = 0
-    for i in range(len(l_a)):   
-        if l_a[err].alive == False:
-            m = Minerl(l_a[err].x,l_a[err].y,2.5)
-            l_m.append(m)
-            for i in range(5):
-                timeSpread = i*5
-                scalespread = 1.8-(i/10)*2
-                e = Explosion(random.randint(l_a[err].x-30,l_a[err].x+l_a[err].width-10),random.randint(l_a[err].y-30,l_a[err].y+l_a[err].height-10),l_a[err].width,l_a[err].height,timeSpread,scalespread)
-                l_e.append(e)
-            del l_a[err]
-            err-=1
-        err+=1
-    
-    err = 0
-    for i in range(len(l_e)):
-        l_e[i].draw(window)
-    for i in range(len(l_e)):
-        if l_e[err].Time_from_death == 35:
-            del l_e[err]
-            err-=1
-        err+=1
-    for i in range(len(l_m)):
-        l_m[i].move_and_draw(window)
-    err = 0
-    for i in range(len(l_m)):
-        if l_m[err].alive == False:
-            del l_m[err]
-            err-=1
-        err+=1
-    for i in range(len(l_m)):
-        if colision1(pygame.Rect(l_m[i].x,l_m[i].y,l_m[i].width,l_m[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
-            minerala +=1
-            minerala_ukupno +=1
-            l_m[i].alive = False
+        
             
-    err = 0
-    for i in range(len(l_m)):
-        if l_m[err].alive == False:
-            del l_m[err]
-            err-=1
-        err+=1
+        #laser
+        q = 0
+        for i in range(len(l_l)):
+            if l_l[q].health == 0:
+                del l_l[q]
+                q-=1
+            q+=1
+        r = 0
         
-    p1.draw(window)
-    p1.move(keys)
+        if keys[pygame.K_SPACE]:
+            if p1.time == 0:
+                p1.time =15
+                if len(l_l) == 40:
+                    for i in range(len(l_l)):
+                        if l_l[i].health == 0:
+                            if p1.health == 2 or p1.health == 3:
+                                l_l[i] = Laser(p1.x+78*0.75,1)
+                            else:
+                                l_l[i] = Laser(p1.x+49*0.75,1)
+                else:
+                    if p1.health == 2 or p1.health == 3:
+                        l1 = Laser(p1.x+78*0.75,1)
+                    else:
+                        l1 = Laser(p1.x+49*0.75,1)
+                    l_l.append(l1)
+        for i in range(len(l_l)):
+            if l_l[i].health != 0:
+                l_l[i].draw(window)
+
+        
+        #background
+        if keys[pygame.K_h]:
+            if p1.health<=2:
+                if minerala>=35:
+                    p1.health+=1
+                    minerala-=35
+        for i in range(len(l_b)):
+            if l_b[r].y >= 765:
+                del l_b[r]
+                r-=1
+            r+=1
+        
+        #asteroids
+        for i in range(len(l_a)):
+            l_a[i].draw(window)
+        r = 0
+        for i in range(len(l_a)):
+            if l_a[r].y >= 765:
+                del l_a[r]
+                r-=1
+            r+=1
+            
+        err = 0
+        for i in range(len(l_a)):
+            if colision1(pygame.Rect(p1.x,p1.y,p1.width,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                p1.health-=1
+                l_a[err].alive=False
+                l_a[err].drop=False
+            err +=1
+        for i in range(len(l_l)):
+            for j in range(len(l_a)):
+                if colision1(pygame.Rect(l_l[i].x,l_l[i].y,l_l[i].width,l_l[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):
+                    if l_a[j].alive == True:
+                        l_l[i].health-=1
+                        l_a[j].alive = False
+                        
+        err = 0
+        for i in range(len(l_a)):   
+            if l_a[err].alive == False:
+                if l_a[err].drop==True:
+                    m = Mineral(l_a[err].x,l_a[err].y,2.5)
+                    l_m.append(m)
+                for i in range(5):
+                    timeSpread = i*5
+                    scaleSpread = 1.8-(i/10)*2
+                    e = Explosion(random.randint(l_a[err].x-30,l_a[err].x+l_a[err].width-10),random.randint(l_a[err].y-30,l_a[err].y+l_a[err].height-10),l_a[err].width,l_a[err].height,timeSpread,scaleSpread)
+                    l_e.append(e)
+                del l_a[err]
+                err-=1
+            err+=1
+        
+        err = 0
+        for i in range(len(l_e)):
+            l_e[i].draw(window)
+        for i in range(len(l_e)):
+            if l_e[err].Time_from_death == 35:
+                del l_e[err]
+                err-=1
+            err+=1
+        for i in range(len(l_m)):
+            l_m[i].move_and_draw(window)
+        err = 0
+        for i in range(len(l_m)):
+            if l_m[err].alive == False:
+                
+                del l_m[err]
+                err-=1
+            err+=1
+        for i in range(len(l_m)):
+            if colision1(pygame.Rect(l_m[i].x,l_m[i].y,l_m[i].width,l_m[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
+                minerala +=1
+                minerala_ukupno +=1
+                l_m[i].alive = False
+                
+        err = 0
+        for i in range(len(l_m)):
+            if l_m[err].alive == False:
+                del l_m[err]
+                err-=1
+            err+=1
+            
+        p1.draw(window)
+        p1.move(keys)
     pygame.display.update()
     clock.tick(60)
