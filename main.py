@@ -198,9 +198,20 @@ class Asteroid:
             s.y+=s.speed
 
 
+def read():
+    f=open("infojson.json","r")
+    info=f.read()
+    info =json.loads(info)
+    f.close()
+    return info
 
+info=read()
 
-
+def write(info):
+    f=open("infojson.json","w")
+    info=json.dumps(info)
+    f.write(info)
+    f.close()
 l_a = []
 l_e = []
 class Explosion:
@@ -280,9 +291,8 @@ def mainmenu():
     l_m=[]
     p1.health=3
     minerala=0
-    minerala_ukupno=0
     prozor=0
-    return l_a,l_l,minerala,minerala_ukupno,prozor,l_e,l_m
+    return l_a,l_l,minerala,prozor,l_e,l_m
 
 
 myfont1 = pygame.font.SysFont('Comic Sans MS', 45)
@@ -316,7 +326,6 @@ kojil=pygame.K_a
 kojid=pygame.K_d
 kojih=pygame.K_h
 
-minerala_ukupno = 0
 minerala = 0
 prozor=0
 washolding=False
@@ -493,13 +502,13 @@ while True:
         mousePos = pygame.mouse.get_pos()
         for event in events:
             if event.type == pygame.QUIT:
-                l_a,l_l,minerala,minerala_ukupno,prozor,l_e,l_m = mainmenu()
+                l_a,l_l,minerala,prozor,l_e,l_m = mainmenu()
                 
         if keys[pygame.K_ESCAPE]:
-            l_a,l_l,minerala,minerala_ukupno,prozor,l_e,l_m = mainmenu()
+            l_a,l_l,minerala,prozor,l_e,l_m = mainmenu()
             washolding=True
         if p1.health==0:
-            l_a,l_l,minerala,minerala_ukupno,prozor,l_e,l_m = mainmenu()
+            l_a,l_l,minerala,prozor,l_e,l_m = mainmenu()
         draw_minerals(25,25,window,minerala)
         
         
@@ -614,7 +623,6 @@ while True:
         for i in range(len(l_m)):
             if colision1(pygame.Rect(l_m[i].x,l_m[i].y,l_m[i].width,l_m[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
                 minerala +=1
-                minerala_ukupno +=1
                 l_m[i].alive = False
                 
         err = 0
