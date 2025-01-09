@@ -30,7 +30,7 @@ def checker(keys,index):
         if keys[key]:
             pressed = key
             break
-    if pressed!=0 and pressed!=pygame.K_h and pressed!=kojis and pressed!=kojid and pressed!=kojil:
+    if pressed!=0 and pressed!=kojih and pressed!=kojis and pressed!=kojid and pressed!=kojil:
         return pressed
     else:
         return index
@@ -38,8 +38,8 @@ def checker(keys,index):
 keydict={
     "shot":keys[pygame.K_SPACE],
     "left":keys[pygame.K_a],
-    "right":keys[pygame.K_d]
-    
+    "right":keys[pygame.K_d],
+    "heal":keys[pygame.K_h]
     
 }
 clock = pygame.time.Clock()
@@ -174,6 +174,7 @@ class Asteroid:
         s.x = x
         s.y = y
         s.drop=True
+        s.strana=random.randint(0,1)
         s.alive = True
         s.Time_from_death = 70
         s.img_choice = random.randint(1,4)
@@ -235,6 +236,7 @@ class Laser:
         self.health = health
         self.dy = -7
         self.scale = 0.3*0.75
+        self.ddy=-0.05
         self.img = pygame.image.load('laser.png')
         self.width = self.img.get_width()*self.scale
         self.height = self.img.get_height()*self.scale
@@ -244,6 +246,7 @@ class Laser:
             if s.y <= -53*0.75:
                 s.health = 0
             s.y+=s.dy
+            s.dy+=s.ddy
             window.blit(s.scaled_img,(s.x,s.y))
 
 class Button:
@@ -269,7 +272,7 @@ class Button:
         if self.text!="":
             window.blit(self.text_surface,(self.x1,self.y1))
 l_l = []
-start=200
+start=50
 def mainmenu():
     l_a=[]
     l_l=[]
@@ -284,14 +287,19 @@ def mainmenu():
 
 myfont1 = pygame.font.SysFont('Comic Sans MS', 45)
 
-p1 = Player(100,550,0,0,6)
+p1 = Player(100,550,0,0,9)
 
 myfont = pygame.font.SysFont('Comic Sans MS', 70)
 
-lb=[Button(228.5,start,"start","",0,0,0,0,None),
-    Button(228.5,start+200,"settings","",0,0,0,0,None),
-    Button(228.5,start+400,"shop","",0,0,0,0,None),
-    Button(60,start-25,"zapucanje","Change shot key from Space",100,start,myfont1,2,6)]
+lb=[Button(228.5,200,"start","",0,0,0,0,None),
+    Button(228.5,400,"settings","",0,0,0,0,None),
+    Button(228.5,600,"shop","",0,0,0,0,None),
+    Button(60,start-25,"zapucanje","Change shoot key from Space",100,start,myfont1,2,6),
+    Button(60,start+150,"zapucanje","Change go left key from a",100,start+175,myfont1,2,6),
+    Button(60,start+325,"zapucanje","Change go right key from d",100,start+350,myfont1,2,6),
+    Button(60,start+500,"zapucanje","Change heal key from h",100,start+525,myfont1,2,6)
+    
+]
 def draw_minerals(x,y,window,minerala):
     img = pygame.image.load("mineral.png")
     width = 30
@@ -306,13 +314,35 @@ qw = "0123456789"
 kojis=pygame.K_SPACE
 kojil=pygame.K_a
 kojid=pygame.K_d
-
+kojih=pygame.K_h
 
 minerala_ukupno = 0
 minerala = 0
 prozor=0
 washolding=False
 while True:
+    if prozor==3:
+        keys = pygame.key.get_pressed()
+        events = pygame.event.get()
+        mouseState = pygame.mouse.get_pressed()
+        mousePos = pygame.mouse.get_pos()
+        for event in events:
+            if event.type == pygame.QUIT:
+                prozor=0
+        if keys[pygame.K_ESCAPE]:
+            prozor=0
+            washolding=True
+        e = random.randint(1,10)
+        if e == 1:
+            w = random.randint(2,5)
+            e = random.randint(10,728)
+            l_b.append(Background(e,w))
+        window.fill("Black")
+        for i in range(len(l_b)):
+            l_b[i].move_and_draw(window)
+        for i in range(len(lb)):
+            if lb[i].prozor==3:
+                lb[i].draw(window)
     if prozor==2:
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
@@ -335,15 +365,65 @@ while True:
         for i in range(len(lb)):
             if lb[i].prozor==2:
                 lb[i].draw(window)
+        #SHOOT CODE BELOW|||||||||||||||||||||||||||||||||||||||||||||||
+        #SHOOT CODE BELOW|||||||||||||||||||||||||||||||||||||||||||||||
+        #SHOOT CODE BELOW|||||||||||||||||||||||||||||||||||||||||||||||
         if button_colision(lb[3].width,lb[3].height,lb[3].x,lb[3].y,mousePos,mouseState):
-            kojis = checker(keys,kojis)
-            if kojis>=48 and kojis<=57:
-                
-                lb[3].text_surface = myfont1.render(f"Change shot key from {qw[kojis-48]}", True, (15, 15, 15))
-            elif kojis == pygame.K_SPACE:
-                lb[3].text_surface = myfont1.render(f"Change shot key from Space", True, (15, 15, 15))
-            else:
-                lb[3].text_surface = myfont1.render(f"Change shot key from {alfabet[kojis-97]}", True, (15, 15, 15))
+            q = checker(keys,kojis)
+            if q>=48 and q<=57:
+                kojis=q
+                lb[3].text_surface = myfont1.render(f"Change shoot key from {qw[kojis-48]}", True, (15, 15, 15))
+            elif q == pygame.K_SPACE:
+                kojis=q
+                lb[3].text_surface = myfont1.render(f"Change shoot key from Space", True, (15, 15, 15))
+            elif q>=97 and q<=97+26:
+                kojis=q
+                lb[3].text_surface = myfont1.render(f"Change shoot key from {alfabet[kojis-97]}", True, (15, 15, 15))
+    #GOING LEFT CODE BELOW|||||||||||||||||||||||||||||||||||||||||||||
+    #GOING LEFT CODE BELOW|||||||||||||||||||||||||||||||||||||||||||||
+    #GOING LEFT CODE BELOW|||||||||||||||||||||||||||||||||||||||||||||
+        if button_colision(lb[4].width,lb[4].height,lb[4].x,lb[4].y,mousePos,mouseState):
+            q = checker(keys,kojil)
+            if q>=48 and q<=57:
+                kojil=q
+                lb[4].text_surface = myfont1.render(f"Change go left key from {qw[kojil-48]}", True, (15, 15, 15))
+            elif q == pygame.K_SPACE:
+                kojil=q
+                lb[4].text_surface = myfont1.render(f"Change go left key from Space", True, (15, 15, 15))
+            elif q>=97 and q<=97+26:
+                kojil=q
+                lb[4].text_surface = myfont1.render(f"Change go left key from {alfabet[kojil-97]}", True, (15, 15, 15))
+    #GOING RIGHT CODE BELOW||||||||||||||||||||||||||||||||||||||||||||
+    #GOING RIGHT CODE BELOW||||||||||||||||||||||||||||||||||||||||||||
+    #GOING RIGHT CODE BELOW||||||||||||||||||||||||||||||||||||||||||||
+        if button_colision(lb[5].width,lb[5].height,lb[5].x,lb[5].y,mousePos,mouseState):
+            q = checker(keys,kojid)
+            if q>=48 and q<=57:
+                kojid=q
+                lb[5].text_surface = myfont1.render(f"Change go right key from {qw[kojid-48]}", True, (15, 15, 15))
+            elif q == pygame.K_SPACE:
+                kojid=q
+                lb[5].text_surface = myfont1.render(f"Change go right key from Space", True, (15, 15, 15))
+            elif q>=97 and q<=97+26:
+                kojid=q
+                lb[5].text_surface = myfont1.render(f"Change go right key from {alfabet[kojid-97]}", True, (15, 15, 15))
+    #HEALING CODE BELOW||||||||||||||||||||||||||||||||||||||||||||||||
+    #HEALING CODE BELOW||||||||||||||||||||||||||||||||||||||||||||||||
+    #HEALING CODE BELOW||||||||||||||||||||||||||||||||||||||||||||||||
+        if button_colision(lb[6].width,lb[6].height,lb[6].x,lb[6].y,mousePos,mouseState):
+            q = checker(keys,kojih)
+            if q>=48 and q<=57:
+                kojih=q
+                lb[6].text_surface = myfont1.render(f"Change heal key from {qw[kojih-48]}", True, (15, 15, 15))
+            elif q == pygame.K_SPACE:
+                kojih=q
+                lb[6].text_surface = myfont1.render(f"Change heal key from Space", True, (15, 15, 15))
+            elif q>=97 and q<=97+26:
+                kojih=q
+                lb[6].text_surface = myfont1.render(f"Change heal key from {alfabet[kojih-97]}", True, (15, 15, 15))
+    
+
+    
     #MAIN MENU CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||
     #MAIN MENU CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||
     #MAIN MENU CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||
@@ -378,6 +458,8 @@ while True:
             prozor=1
         if button_colision(lb[1].width,lb[1].height,lb[1].x,lb[1].y,mousePos,mouseState):
             prozor=2
+        if button_colision(lb[2].width,lb[2].height,lb[2].x,lb[2].y,mousePos,mouseState):
+            prozor=3
     #GAME CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||||||
     #GAME CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||||||
     #GAME CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||||||
@@ -389,10 +471,12 @@ while True:
         levo =keys[kojil]
         desno=keys[kojid]
         pucaj=keys[kojis]
+        heluj=keys[kojih]
         keydict["left"]=levo
         keydict["right"]=desno
         keydict["shot"]=pucaj
-        a_r = random.randint(1,10)
+        keydict["heal"]=heluj
+        a_r = random.randint(1,20)
         if a_r == 1:
             ast = Asteroid(random.randint(25,700),-70)
             l_a.append(ast)
@@ -410,6 +494,7 @@ while True:
         for event in events:
             if event.type == pygame.QUIT:
                 l_a,l_l,minerala,minerala_ukupno,prozor,l_e,l_m = mainmenu()
+                
         if keys[pygame.K_ESCAPE]:
             l_a,l_l,minerala,minerala_ukupno,prozor,l_e,l_m = mainmenu()
             washolding=True
@@ -430,7 +515,7 @@ while True:
 
         if keydict["shot"]:
             if p1.time <= 0:
-                p1.time =13
+                p1.time =10
                 if len(l_l) == 100:
                     for i in range(len(l_l)):
                         if l_l[i].health == 0:
@@ -450,7 +535,7 @@ while True:
 
         
         #background
-        if keys[pygame.K_h]:
+        if keydict["heal"]:
             if p1.health<=2:
                 if minerala>=35:
                     p1.health+=1
@@ -464,7 +549,8 @@ while True:
         
         #asteroids
         for i in range(len(l_a)):
-            l_a[i].draw(window)
+            if l_a[i].strana==0:
+                l_a[i].draw(window)
         r = 0
         for i in range(len(l_a)):
             if l_a[r].y >= 765:
@@ -474,13 +560,20 @@ while True:
             
         err = 0
         for i in range(len(l_a)):
-            if colision1(pygame.Rect(p1.x,p1.y,p1.width,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
-                p1.health-=1
-                l_a[err].alive=False
-                l_a[err].drop=False
+            if p1.health!=1:
+                if colision1(pygame.Rect(p1.x+30,p1.y,p1.width-60,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                    p1.health-=1
+                    l_a[err].alive=False
+                    l_a[err].drop=False
+            else:
+                if colision1(pygame.Rect(p1.x,p1.y,p1.width-30,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                    p1.health-=1
+                    l_a[err].alive=False
+                    l_a[err].drop=False
             err +=1
         for i in range(len(l_l)):
             for j in range(len(l_a)):
+                
                 if colision1(pygame.Rect(l_l[i].x,l_l[i].y,l_l[i].width,l_l[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):         
                     if l_a[j].alive == True:
                         l_l[i].health-=1
@@ -533,5 +626,15 @@ while True:
             
         p1.draw(window)
         p1.move(keydict)
+        #asteroids
+        for i in range(len(l_a)):
+            if l_a[i].strana==1:
+                l_a[i].draw(window)
+        r = 0
+        for i in range(len(l_a)):
+            if l_a[r].y >= 765:
+                del l_a[r]
+                r-=1
+            r+=1
     pygame.display.update()
     clock.tick(60)
