@@ -226,7 +226,37 @@ class Explosion:
             s.Time_from_death+=1
         else:
             s.t-=1
-    
+
+class Rotated_Laser:
+    def __init__(self,x,y,angle):
+        self.x=x
+        self.y=y
+        self.health=1
+        self.angle=angle
+        self.scale=0.3*0.75
+        self.dy=-7
+        self.ddy=-0.05
+        self.img = pygame.image.load('laser.png')
+        self.width = self.img.get_width()*self.scale
+        self.height = self.img.get_height()*self.scale
+        self.scaled_img = pygame.transform.scale(self.img, (self.width, self.height))
+        if self.angle==45:
+            self.dx=-7
+            self.ddx=-0.05
+        else:
+            self.dx=7
+            self.ddx=0.05
+        self.rotated_img=pygame.transform.rotate(self.scaled_img,self.angle)
+    def move_and_draw(s,window):
+        window.blit(s.rotated_img,(s.x,s.y))
+        s.x+=s.dx
+        s.dx+=s.ddx
+        s.y+=s.dy
+        s.dy+=s.ddy
+        if s.x<=-100 or s.x>865:
+            s.health=0
+l_lr=[]
+
 class Laser:
     def __init__(self,x,health):
         self.x = x
@@ -234,7 +264,7 @@ class Laser:
         self.health = health
         self.dy = -7
         self.scale = 0.3*0.75
-        self.ddy=-0.05
+        self.ddy=-0.5
         self.img = pygame.image.load('laser.png')
         self.width = self.img.get_width()*self.scale
         self.height = self.img.get_height()*self.scale
@@ -329,10 +359,63 @@ def draw_minerals(x,y,window,minerala):
     myfont = pygame.font.SysFont('B', 45)
     text_surface = myfont.render(f"{minerala}", True, (255, 255, 255))
     window.blit(text_surface,(x+55,y))
-kojis=pygame.K_SPACE
-kojil=pygame.K_a
-kojid=pygame.K_d
-kojih=pygame.K_h
+
+
+def prom(index):
+    lb[index].width1=lb[index].text_surface.get_width()
+    lb[index].height1=lb[index].text_surface.get_height()
+
+
+kojis=info["kojis"]
+kojil=info["kojil"]
+kojid=info["kojid"]
+kojih=info["kojih"]
+q=kojis
+if q==32:
+    info["kojis"]=q
+    kojis=q
+    lb[3].text_surface = myfont1.render(f"Change shoot key from Space", True, (15, 15, 15))
+if q>=33 and q<=126:
+    info["kojis"]=q
+    kojis=q
+    lb[3].text_surface = myfont1.render(f"Change shoot key from {char[kojis-34]}", True, (15, 15, 15))
+
+q=kojil
+if q==32:
+    kojil=q
+    info["kojil"]=q
+    lb[4].text_surface = myfont1.render(f"Change go left key from Space", True, (15, 15, 15))
+if q>=33 and q<=126:
+    kojil=q
+    info["kojil"]=q
+    lb[4].text_surface = myfont1.render(f"Change go left key from {char[kojil-34]}", True, (15, 15, 15))
+
+
+q=kojid
+if q==32:
+    kojid=q
+    info["kojid"]=q
+    lb[5].text_surface = myfont1.render(f"Change sgo right key from Space", True, (15, 15, 15))
+if q>=33 and q<=126:
+    kojid=q
+    info["kojid"]=q
+    lb[5].text_surface = myfont1.render(f"Change go right key from {char[kojid-34]}", True, (15, 15, 15))
+
+
+q=kojih
+if q==32:
+    kojih=q
+    info["kojih"]=q
+    lb[6].text_surface = myfont1.render(f"Change heal key from Space", True, (15, 15, 15))
+if q>=33 and q<=126:
+    kojih=q
+    info["kojih"]=q
+    lb[6].text_surface = myfont1.render(f"Change heal key from {char[kojih-34]}", True, (15, 15, 15))
+prom(3)
+prom(4)
+prom(5)
+prom(6)
+
 ukupnom=info["minerala"]
 minerala = 0
 prozor=0
@@ -382,50 +465,66 @@ while True:
         for i in range(len(lb)):
             if lb[i].prozor==2:
                 lb[i].draw(window)
-        #SHOOT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||||
-        #SHOOT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||||
-        #SHOOT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||||
+    #SHOOT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||||
+    #SHOOT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||||
+    #SHOOT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||||
         if button_colision(lb[3].width,lb[3].height,lb[3].x,lb[3].y,mousePos,mouseState):
             q = checker(keys,kojis)
             if q==32:
+                info["kojis"]=q
+                kojis=q
                 lb[3].text_surface = myfont1.render(f"Change shoot key from Space", True, (15, 15, 15))
+                prom(3)
             if q>=33 and q<=126:
+                info["kojis"]=q
                 kojis=q
                 lb[3].text_surface = myfont1.render(f"Change shoot key from {char[kojis-34]}", True, (15, 15, 15))
-
+                prom(3)
     #GOING LEFT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||
     #GOING LEFT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||
     #GOING LEFT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||
         if button_colision(lb[4].width,lb[4].height,lb[4].x,lb[4].y,mousePos,mouseState):
             q = checker(keys,kojil)
             if q==32:
+                kojil=q
+                info["kojil"]=q
                 lb[4].text_surface = myfont1.render(f"Change go left key from Space", True, (15, 15, 15))
+                prom(4)
             if q>=33 and q<=126:
                 kojil=q
+                info["kojil"]=q
                 lb[4].text_surface = myfont1.render(f"Change go left key from {char[kojil-34]}", True, (15, 15, 15))
-
+                prom(4)
     #GOING RIGHT CODE BELOW |||||||||||||||||||||||||||||||||||||||||||
     #GOING RIGHT CODE BELOW |||||||||||||||||||||||||||||||||||||||||||
     #GOING RIGHT CODE BELOW |||||||||||||||||||||||||||||||||||||||||||
         if button_colision(lb[5].width,lb[5].height,lb[5].x,lb[5].y,mousePos,mouseState):
             q = checker(keys,kojid)
             if q==32:
+                kojid=q
+                info["kojid"]=q
                 lb[5].text_surface = myfont1.render(f"Change sgo right key from Space", True, (15, 15, 15))
+                prom(5)
             if q>=33 and q<=126:
                 kojid=q
+                info["kojid"]=q
                 lb[5].text_surface = myfont1.render(f"Change go right key from {char[kojid-34]}", True, (15, 15, 15))
-
+                prom(5)
     #HEALING CODE BELOW |||||||||||||||||||||||||||||||||||||||||||||||
     #HEALING CODE BELOW |||||||||||||||||||||||||||||||||||||||||||||||
     #HEALING CODE BELOW |||||||||||||||||||||||||||||||||||||||||||||||
         if button_colision(lb[6].width,lb[6].height,lb[6].x,lb[6].y,mousePos,mouseState):
             q = checker(keys,kojih)
             if q==32:
+                kojih=q
+                info["kojih"]=q
                 lb[6].text_surface = myfont1.render(f"Change heal key from Space", True, (15, 15, 15))
+                prom(6)
             if q>=33 and q<=126:
                 kojih=q
+                info["kojih"]=q
                 lb[6].text_surface = myfont1.render(f"Change heal key from {char[kojih-34]}", True, (15, 15, 15))
-    
+                prom(6)
     
 
     
@@ -519,11 +618,16 @@ while True:
                 q-=1
             q+=1
         r = 0
-
+        q=0
+        for i in range(len(l_lr)):
+            if l_lr[q].health == 0:
+                del l_lr[q]
+                q-=1
+            q+=1
         if keydict["shot"]:
             if p1.time <= 0:
                 p1.time =10
-                if len(l_l) == 100:
+                if len(l_l) >= 100:
                     for i in range(len(l_l)):
                         if l_l[i].health == 0:
                             if p1.health == 2 or p1.health == 3:
@@ -533,13 +637,20 @@ while True:
                 else:
                     if p1.health == 2 or p1.health == 3:
                         l1 = Laser(p1.x+78*0.75,1)
+                        l1r=Rotated_Laser(p1.x-10,p1.y-20,45)
+                        l_lr.append(l1r)
+                        l2r=Rotated_Laser(p1.x+90,p1.y-20,315)
                     else:
                         l1 = Laser(p1.x+49*0.75,1)
+                        l2r=Rotated_Laser(p1.x+90,p1.y-20,315)
                     l_l.append(l1)
+                    l_lr.append(l2r)
         for i in range(len(l_l)):
             if l_l[i].health != 0:
                 l_l[i].draw(window)
-
+        for i in range(len(l_lr)):
+            if l_lr[i].health != 0:
+                l_lr[i].move_and_draw(window)
         
         #background
         if keydict["heal"]:
@@ -583,11 +694,16 @@ while True:
                 
                 if colision1(pygame.Rect(l_l[i].x,l_l[i].y,l_l[i].width,l_l[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):         
                     if l_a[j].alive == True:
-                        l_l[i].health-=1
+                        l_l[i].health=0
                         l_a[j].alive = False
-                        
+        for i in range(len(l_lr)):
+            for j in range(len(l_a)):
+                if colision1(pygame.Rect(l_lr[i].x,l_lr[i].y,l_lr[i].width,l_lr[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):
+                    if l_a[j].alive == True:
+                        l_lr[i].health=0
+                        l_a[j].alive = False
         err = 0
-        for i in range(len(l_a)):   
+        for i in range(len(l_a)):
             if l_a[err].alive == False:
                 if l_a[err].drop==True:
                     m = Mineral(l_a[err].x,l_a[err].y,2.5)
