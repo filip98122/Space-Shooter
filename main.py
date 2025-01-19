@@ -4,9 +4,33 @@ import random
 import math
 import time
 import json
+from cryptography.fernet import Fernet
 pygame.init()
 pygame.mixer.init()
 keys = pygame.key.get_pressed()
+keyE = b'nL5cTPi0324Gk2zgRDR6E4Y2iVHfWnrKu4kGzcB1ZnU='
+
+def ens():
+    f=Fernet(keyE)
+    with open("infojson.json", "rb") as file:
+        file_data = file.read()
+    encrypted_data = f.encrypt(file_data)
+    with open("infojson.json", "wb") as file:
+        file.write(encrypted_data)
+        
+
+def end():
+    f=Fernet(keyE)
+    with open("infojson.json", "rb") as file:
+        encrypted_data = file.read()
+    decrypted_data = f.decrypt(encrypted_data)
+    with open("infojson.json", "wb") as file:
+        file.write(decrypted_data)
+
+end()
+
+
+
 def collison(x1,y1,r1,x2,y2,r2):
     dx = x2 - x1
     dy = y2 - y1
@@ -94,11 +118,11 @@ class Player:
         s.speed = speed
         s.health = 3
         s.scale = 0.225
+        s.power_rb=0
+        s.power_db=0
         
         
-        
-        
-        s.img = pygame.image.load('1.png')
+        s.img = pygame.image.load('1c.png')
         s.width = s.img.get_width()*s.scale
         s.height = s.img.get_height()*s.scale
         e=pygame.transform.scale(s.img, (s.width, s.height))
@@ -116,10 +140,25 @@ class Player:
         s.height = s.img.get_height()*s.scale
         q=pygame.transform.scale(s.img, (s.width, s.height))
         
+        s.img = pygame.image.load('1l.png')
+        s.width = s.img.get_width()*s.scale
+        s.height = s.img.get_height()*s.scale
+        t=pygame.transform.scale(s.img, (s.width, s.height))
+        
+        s.img = pygame.image.load('1r.png')
+        s.width = s.img.get_width()*s.scale
+        s.height = s.img.get_height()*s.scale
+        r=pygame.transform.scale(s.img, (s.width, s.height))
+        s.str=""
+        
+        
         s.dict={
             3:q,
             2:w,
-            1:e 
+            "1c":e,
+            "1l":t,
+            "1r":r
+            
         }
         
 
@@ -128,9 +167,14 @@ class Player:
         if self.health==0:
             return
         else:
-            self.width=self.dict[self.health].get_width()
-            self.height=self.dict[self.health].get_height()
-            window.blit(self.dict[self.health],(self.x,self.y))
+            if self.health!=1:
+                self.width=self.dict[self.health].get_width()
+                self.height=self.dict[self.health].get_height()
+                window.blit(self.dict[self.health],(self.x,self.y))
+            else:
+                self.width=self.dict[f'{self.health}{self.str}'].get_width()
+                self.height=self.dict[f'{self.health}{self.str}'].get_height()
+                window.blit(self.dict[f'{self.health}{self.str}'],(self.x,self.y))
     def move(s,keys):
         s.dx = 0
         s.cant_go_left = False
@@ -151,6 +195,10 @@ class Player:
         if s.time>0:
             s.time-=1
 
+        if s.power_rb>0:
+            s.power_rb-=1
+        if s.power_db>0:
+            s.power_db-=1
 
 class Mineral:
     def __init__(s,x,y,dy):
@@ -257,6 +305,41 @@ class Rotated_Laser:
             s.health=0
 l_lr=[]
 
+class Power_up_db:
+    def __init__(s,x,y):
+        s.x=x
+        s.y=y
+        s.speed=2.5
+        s.alive=True
+        s.image=pygame.image.load("powerupdb.png")
+        s.height = 45
+        s.width = 45
+        s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
+    def move_and_draw(s,window):
+        window.blit(s.scaled_img,(s.x,s.y))
+        s.y+=s.speed
+        if s.y>=770:
+            s.alive=False
+
+
+
+
+class Power_up_rb:
+    def __init__(s,x,y):
+        s.x=x
+        s.y=y
+        s.speed=2.5
+        s.alive=True
+        s.image=pygame.image.load("poweruprb.png")
+        s.height = 45
+        s.width = 45
+        s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
+    def move_and_draw(s,window):
+        s.y+=s.speed
+        window.blit(s.scaled_img,(s.x,s.y))
+        if s.y>=770:
+            s.alive=False
+
 class Laser:
     def __init__(self,x,health):
         self.x = x
@@ -304,6 +387,10 @@ start=50
 def mainmenu():
     global ukupnom
     global minerala
+    global l_lr
+    global l_prb
+    l_prb=[]
+    l_lr=[]
     l_a=[]
     l_l=[]
     l_e=[]
@@ -402,6 +489,9 @@ if q>=33 and q<=126:
     lb[5].text_surface = myfont1.render(f"Change go right key from {char[kojid-34]}", True, (15, 15, 15))
 
 
+
+l_pdb=[]
+l_prb=[]
 q=kojih
 if q==32:
     kojih=q
@@ -503,7 +593,7 @@ while True:
             if q==32:
                 kojid=q
                 info["kojid"]=q
-                lb[5].text_surface = myfont1.render(f"Change sgo right key from Space", True, (15, 15, 15))
+                lb[5].text_surface = myfont1.render(f"Change go right key from Space", True, (15, 15, 15))
                 prom(5)
             if q>=33 and q<=126:
                 kojid=q
@@ -542,10 +632,12 @@ while True:
         for event in events:
             if event.type == pygame.QUIT:
                 write(info)
+                ens()
                 exit()
         if keys[pygame.K_ESCAPE]:
             if washolding==False:
                 write(info)
+                ens()
                 exit()
         else:
             washolding=False
@@ -635,16 +727,62 @@ while True:
                             else:
                                 l_l[i] = Laser(p1.x+49*0.75,1)
                 else:
-                    if p1.health == 2 or p1.health == 3:
-                        l1 = Laser(p1.x+78*0.75,1)
-                        l1r=Rotated_Laser(p1.x-10,p1.y-20,45)
-                        l_lr.append(l1r)
-                        l2r=Rotated_Laser(p1.x+90,p1.y-20,315)
+                    if p1.power_db==0:
+                        if p1.health == 2 or p1.health == 3:
+                            l1 = Laser(p1.x+58.5,1)
+                        else:
+                            if p1.str=="l":
+                                l1 = Laser(p1.x+36.79,1)
+                            else:
+                                l1 = Laser(p1.x+57,1)
+                        l_l.append(l1)
+                        if p1.power_rb>0:
+                            if p1.health>1 or p1.str=="c":
+                                l1r=Rotated_Laser(p1.x-10,p1.y-20,45)
+                                l_lr.append(l1r)
+                                l2r=Rotated_Laser(p1.x+90,p1.y-20,315)
+                                l_lr.append(l2r)
+                            else:
+                                if p1.str=="l":
+                                    l2r=Rotated_Laser(p1.x+90,p1.y-20,315)
+                                    l_lr.append(l2r)
+                                else:
+                                    l1r=Rotated_Laser(p1.x-10,p1.y-20,45)
+                                    l_lr.append(l1r)
                     else:
-                        l1 = Laser(p1.x+49*0.75,1)
-                        l2r=Rotated_Laser(p1.x+90,p1.y-20,315)
-                    l_l.append(l1)
-                    l_lr.append(l2r)
+                        if p1.health == 2 or p1.health == 3:
+                            l1 = Laser(p1.x+43.5,1)
+                            l2 = Laser(p1.x+74,1)
+                        else:
+                            if p1.str=="l":
+                                l1 = Laser(p1.x+22,1)
+                                l2 = Laser(p1.x+52,1)
+                            else:
+                                l1 = Laser(p1.x+42,1)
+                                l2 = Laser(p1.x+72,1)
+                        l_l.append(l1)
+                        l_l.append(l2)
+                        if p1.power_rb>0:
+                            if p1.str=="l":
+                                l2r=Rotated_Laser(p1.x+90,p1.y-5,315)
+                                l_lr.append(l2r)
+                                l2r=Rotated_Laser(p1.x+90,p1.y-35,315)
+                                l_lr.append(l2r)
+                            elif p1.str=="r":
+                                l1r=Rotated_Laser(p1.x-10,p1.y-5,45)
+                                l_lr.append(l1r)
+                                l1r=Rotated_Laser(p1.x-10,p1.y-35,45)
+                                l_lr.append(l1r)
+                            else:
+                                l1r=Rotated_Laser(p1.x-10,p1.y-5,45)
+                                l_lr.append(l1r)
+                                l1r=Rotated_Laser(p1.x-10,p1.y-35,45)
+                                l_lr.append(l1r)
+                                
+                                l2r=Rotated_Laser(p1.x+90,p1.y-5,315)
+                                l_lr.append(l2r)
+                                l2r=Rotated_Laser(p1.x+90,p1.y-35,315)
+                                l_lr.append(l2r)
         for i in range(len(l_l)):
             if l_l[i].health != 0:
                 l_l[i].draw(window)
@@ -680,14 +818,33 @@ while True:
         for i in range(len(l_a)):
             if p1.health!=1:
                 if colision1(pygame.Rect(p1.x+30,p1.y,p1.width-60,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                    if p1.health==2:
+                        if colision1(pygame.Rect(p1.x+30,p1.y,23,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                            p1.str="l"
+                        elif colision1(pygame.Rect(p1.x+53,p1.y,23,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                            p1.str="c"
+                        else:
+                            p1.str="r"
+                    
                     p1.health-=1
                     l_a[err].alive=False
                     l_a[err].drop=False
             else:
-                if colision1(pygame.Rect(p1.x,p1.y,p1.width-30,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
-                    p1.health-=1
-                    l_a[err].alive=False
-                    l_a[err].drop=False
+                if p1.str=="l":
+                    if colision1(pygame.Rect(p1.x,p1.y,p1.width-30,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                        p1.health-=1
+                        l_a[err].alive=False
+                        l_a[err].drop=False
+                elif p1.str=="r":
+                    if colision1(pygame.Rect(p1.x+30,p1.y,p1.width,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                        p1.health-=1
+                        l_a[err].alive=False
+                        l_a[err].drop=False
+                else:
+                    if colision1(pygame.Rect(p1.x,p1.y,p1.width,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                        p1.health-=1
+                        l_a[err].alive=False
+                        l_a[err].drop=False
             err +=1
         for i in range(len(l_l)):
             for j in range(len(l_a)):
@@ -706,8 +863,16 @@ while True:
         for i in range(len(l_a)):
             if l_a[err].alive == False:
                 if l_a[err].drop==True:
-                    m = Mineral(l_a[err].x,l_a[err].y,2.5)
-                    l_m.append(m)
+                    prob_powerup= random.randint(1,60)
+                    if prob_powerup==1:
+                        p=Power_up_rb(l_a[err].x,l_a[err].y)
+                        l_prb.append(p)
+                    elif prob_powerup==2:
+                        p=Power_up_db(l_a[err].x,l_a[err].y)
+                        l_pdb.append(p)
+                    else:
+                        m = Mineral(l_a[err].x,l_a[err].y,2.5)
+                        l_m.append(m)
                 for i in range(5):
                     timeSpread = i*5
                     scaleSpread = 1.8-(i/10)*2
@@ -758,5 +923,41 @@ while True:
                 del l_a[r]
                 r-=1
             r+=1
+          
+          
+          
+        i=0
+        for j in range(len(l_pdb)):
+            if l_pdb[i].alive==False:
+                del l_pdb[i]
+                i-=1
+            i+=1
+        i=0
+        for j in range(len(l_pdb)):
+            l_pdb[i].move_and_draw(window)
+            if colision1(pygame.Rect(l_pdb[i].x,l_pdb[i].y,l_pdb[i].width,l_pdb[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
+                del l_pdb[i]
+                p1.power_db=300
+                i-=1
+            i+=1
+          
+          
+            
+            
+            
+        i=0
+        for j in range(len(l_prb)):
+            if l_prb[i].alive==False:
+                del l_prb[i]
+                i-=1
+            i+=1
+        i=0
+        for j in range(len(l_prb)):
+            l_prb[i].move_and_draw(window)
+            if colision1(pygame.Rect(l_prb[i].x,l_prb[i].y,l_prb[i].width,l_prb[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
+                del l_prb[i]
+                p1.power_rb=300
+                i-=1
+            i+=1
     pygame.display.update()
     clock.tick(60)
