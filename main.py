@@ -1,3 +1,4 @@
+
 import os
 import pygame
 import random
@@ -181,14 +182,12 @@ class Player:
         s.cant_go_right = False
         if s.x>=2:
             if keys["left"]:
-                if keys["right"] == False:
-                    s.dx = -s.speed
+                s.dx -= s.speed
         else:
             s.cant_go_left = True
         if s.x+s.width<763:
             if keys["right"]:
-                if s.dx == 0:
-                    s.dx = s.speed
+                s.dx += s.speed
         else:
             s.cant_go_right = True
         s.x+=s.dx
@@ -389,6 +388,12 @@ def mainmenu():
     global minerala
     global l_lr
     global l_prb
+    global l_pdb
+    l_pdb=[]
+    global p1
+    p1.power_db=0
+    p1.power_rb=0
+    p1.str=""
     l_prb=[]
     l_lr=[]
     l_a=[]
@@ -453,6 +458,35 @@ def prom(index):
     lb[index].height1=lb[index].text_surface.get_height()
 
 
+class Store:
+    def __init__(s,x,y,index,text,cost,quantity,op):
+        s.x =x
+        s.y=y
+        s.quantity=quantity
+        s.index=index
+        s.op=op
+        s.cost=cost
+        s.img = pygame.image.load("buttons.png")
+        myfont = pygame.font.SysFont('B', 45)
+        s.text_surface = myfont.render(f"{text}", True, (255, 255, 255))
+        s.width1=s.text_surface.get_width()
+        s.height1=s.text_surface.get_height()
+        s.width = s.width1+20
+        s.height = s.height1+20
+        s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))
+    def draw(s,window):
+        window.blit(s.scaled_img,(s.x,s.y))
+        window.blit(s.text_surface,(s.x+10,s.y+10))
+
+l_s=[
+    Store(100,100,"fire rate","Laser exhaust",100,7,-1)
+    
+    
+    
+    
+    
+    
+]
 kojis=info["kojis"]
 kojil=info["kojil"]
 kojid=info["kojid"]
@@ -511,6 +545,12 @@ minerala = 0
 prozor=0
 washolding=False
 while True:
+#STORE CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||||
+#STORE CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||||
+#STORE CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||||
+#STORE CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||||
+#STORE CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||||
+#STORE CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||||
     if prozor==3:
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
@@ -533,6 +573,19 @@ while True:
         for i in range(len(lb)):
             if lb[i].prozor==3:
                 lb[i].draw(window)
+        for i in range(len(l_s)):
+            l_s[i].draw(window)
+            if button_colision(l_s[i].width,l_s[i].height,l_s[i].x,l_s[i].y,mousePos,mouseState):
+                if ukupnom>=l_s[i].cost:
+                    if l_s[i].quantity<info[l_s[i].index]:
+                        ukupnom-=l_s[i].cost
+                        info[l_s[i].index]+=l_s[i].op
+#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
     if prozor==2:
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
@@ -718,7 +771,7 @@ while True:
             q+=1
         if keydict["shot"]:
             if p1.time <= 0:
-                p1.time =10
+                p1.time =info["fire rate"]
                 if len(l_l) >= 100:
                     for i in range(len(l_l)):
                         if l_l[i].health == 0:
@@ -796,6 +849,8 @@ while True:
                 if minerala>=35:
                     p1.health+=1
                     minerala-=35
+                    if p1.health==1:
+                        p1.str=""
                 
         for i in range(len(l_b)):
             if l_b[r].y >= 765:
@@ -863,7 +918,7 @@ while True:
         for i in range(len(l_a)):
             if l_a[err].alive == False:
                 if l_a[err].drop==True:
-                    prob_powerup= random.randint(1,60)
+                    prob_powerup= random.randint(1,15)
                     if prob_powerup==1:
                         p=Power_up_rb(l_a[err].x,l_a[err].y)
                         l_prb.append(p)
@@ -923,9 +978,9 @@ while True:
                 del l_a[r]
                 r-=1
             r+=1
-          
-          
-          
+        
+        
+        
         i=0
         for j in range(len(l_pdb)):
             if l_pdb[i].alive==False:
@@ -940,8 +995,8 @@ while True:
                 p1.power_db=300
                 i-=1
             i+=1
-          
-          
+        
+        
             
             
             
