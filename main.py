@@ -1,4 +1,3 @@
-
 import os
 import pygame
 import random
@@ -83,27 +82,29 @@ def button_colision(width,height,x,y,mousePos,mouseState):
         return False
 
 class Background:
-    def __init__(s,x,speedy):
+    def __init__(s,x):
         s.x = x
         s.y = 0
         s.scale = 9
-        s.speedy = speedy
         s.d = random.randint(1,5)
-        if s.d == 1:
+        s.speedy=s.d
+        if s.d == 5:
             s.image = pygame.image.load('star1.png')
             s.width = s.image.get_width()/2.1
             s.height = s.image.get_height()/2.1
             s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
-        if s.d >= 3:
+        if s.d <= 3:
             s.image = pygame.image.load('star3.png')
             s.width = s.image.get_width()
             s.height = s.image.get_height()
             s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
-        if s.d == 2:
+        if s.d == 4:
             s.image = pygame.image.load('star2.png')
             s.width = s.image.get_width()/1.8
             s.height = s.image.get_height()/1.8
             s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
+        if s.speedy==1:
+            s.speedy+=1
     def move_and_draw(s,window):
         s.y+=s.speedy
         window.blit(s.scaled_img,(s.x,s.y))
@@ -199,6 +200,74 @@ class Player:
         if s.power_db>0:
             s.power_db-=1
 
+class Particle:
+    def __init__(s,x,y,lifetime,dx,dy,width,height):
+        s.x=x
+        s.y=y
+        s.lifetime=lifetime
+        s.dx=dx
+        s.dy=dy
+        s.ddx=0
+        s.ddy=0.1
+        scale=0.3
+        s.img=pygame.image.load("particle.png")
+        s.width=s.img.get_width()*scale
+        s.height=s.img.get_height()*scale
+        s.scldimg=pygame.transform.scale(s.img,(s.width,s.height))
+    def draw(s,window):
+        window.blit(s.scldimg,(s.x,s.y))
+        
+class Particle_System:
+    def __init__(s):
+        s.l_p=[]
+        
+    def draw(s,window):
+        for i in range(len(s.l_p)):
+            s.l_p[i].draw(window)
+    
+    
+    def update(s):
+        # Spawn new particles if needed
+        probpart=random.randint(1,5)
+        if probpart==1:
+            w=random.randint(1,3)
+            qqq=random.randint(1,2)
+            if qqq==1:
+                w*=-1
+            s.l_p.append(Particle(375,50,75,w,4,100,100))
+        
+        
+        count=0
+        for i in range(len(s.l_p)):
+            if s.l_p[count].lifetime<=0:
+                del s.l_p[count]
+                count-=1
+            count+=1
+        
+        # Movement
+        for i in range(len(s.l_p)):
+            if s.l_p[i].lifetime>=1:
+                s.l_p[i].x+=s.l_p[i].dx
+                s.l_p[i].y+=s.l_p[i].dy
+                s.l_p[i].dy+=s.l_p[i].ddy
+                if s.l_p[i].y>HEIGHT+10:
+                    s.l_p[i].lifetime=0
+                
+                s.l_p[i].lifetime-=1
+
+
+
+
+
+
+
+
+part=Particle_System()
+
+
+
+
+
 class Mineral:
     def __init__(s,x,y,dy):
         s.x = x
@@ -244,7 +313,12 @@ class Asteroid:
             window.blit(s.scaled_img,(s.x,s.y))
             s.y+=s.speed
 
-
+def death():
+    hs=info["highscore"]
+    font=pygame.sysfont.SysFont("B",45)
+    txts= font.render(f"{minerala}", True, (15, 15, 15))
+    txts1= font.render(f"{hs}", True, (15, 15, 15))
+    window.blit(txts,(300,300))
 
 l_a = []
 l_e = []
@@ -523,7 +597,6 @@ if q>=33 and q<=126:
     lb[5].text_surface = myfont1.render(f"Change go right key from {char[kojid-34]}", True, (15, 15, 15))
 
 
-
 l_pdb=[]
 l_prb=[]
 q=kojih
@@ -539,12 +612,65 @@ prom(3)
 prom(4)
 prom(5)
 prom(6)
-
+qq=1
 ukupnom=info["minerala"]
 minerala = 0
 prozor=0
 washolding=False
 while True:
+    if prozor==-1:
+        if qq==1:
+            qq=0
+            aaa=info["highscore"]
+            font=pygame.sysfont.SysFont("B",45)
+            font1=pygame.sysfont.SysFont("B",75)
+            font2=pygame.sysfont.SysFont("B",100)
+            txts= font1.render(f"Minerals: {minerala}", True, (255, 255, 255))
+            txtsw=txts.get_width()
+            txts1= font.render(f"Highscore: {aaa}", True,  (255, 255, 255))
+            txtsw2=txts.get_width()
+            txts2= font2.render(f"You died!", True,  (255, 255, 255))
+            txtsw1=txts1.get_width()
+        
+        window.fill("Black")
+        e = random.randint(1,10)
+        if e == 1:
+            e = random.randint(10,728)
+            l_b.append(Background(e))
+        for i in range(len(l_b)):
+            l_b[i].move_and_draw(window)
+        window.blit(txts2,(WIDTH//2-txtsw2//2,100))
+        window.blit(txts1,(WIDTH//2-txtsw1//2,410))
+        window.blit(txts,(WIDTH//2-txtsw//2,300))
+        keys = pygame.key.get_pressed()
+        events = pygame.event.get()
+        mouseState = pygame.mouse.get_pressed()
+        mousePos = pygame.mouse.get_pos()
+        for event in events:
+            if event.type == pygame.QUIT:
+                prozor=0
+        if keys[pygame.K_ESCAPE]:
+            if washolding==False:
+                prozor=0
+                washolding=True
+        else:
+            washolding=False
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 #STORE CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||||
 #STORE CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||||
 #STORE CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||||
@@ -564,9 +690,8 @@ while True:
             washolding=True
         e = random.randint(1,10)
         if e == 1:
-            w = random.randint(2,5)
             e = random.randint(10,728)
-            l_b.append(Background(e,w))
+            l_b.append(Background(e))
         window.fill("Black")
         for i in range(len(l_b)):
             l_b[i].move_and_draw(window)
@@ -599,9 +724,8 @@ while True:
             washolding=True
         e = random.randint(1,10)
         if e == 1:
-            w = random.randint(2,5)
             e = random.randint(10,728)
-            l_b.append(Background(e,w))
+            l_b.append(Background(e))
         window.fill("Black")
         for i in range(len(l_b)):
             l_b[i].move_and_draw(window)
@@ -696,10 +820,12 @@ while True:
             washolding=False
         e = random.randint(1,10)
         if e == 1:
-            w = random.randint(2,5)
             e = random.randint(10,728)
-            l_b.append(Background(e,w))
+            l_b.append(Background(e))
         window.fill("Black")
+        part.draw(window)
+        part.update()
+        
         for i in range(len(l_b)):
             l_b[i].move_and_draw(window)
         for i in range(len(lb)):
@@ -718,6 +844,8 @@ while True:
     #GAME CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||||||
     #GAME CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||||||
     if prozor==1:
+        if info["fire rate"]<7:
+            info["fire rate"]=7
         keys = pygame.key.get_pressed()
         levo =keys[kojil]
         desno=keys[kojid]
@@ -733,9 +861,8 @@ while True:
             l_a.append(ast)
         e = random.randint(1,20)
         if e == 1:
-            w = random.randint(2,5)
             e = random.randint(10,728)
-            l_b.append(Background(e,w))
+            l_b.append(Background(e))
         window.fill("Black")
         for i in range(len(l_b)):
             l_b[i].move_and_draw(window)
@@ -744,13 +871,17 @@ while True:
         mousePos = pygame.mouse.get_pos()
         for event in events:
             if event.type == pygame.QUIT:
-                l_a,l_l,prozor,l_e,l_m = mainmenu()
-                
+                l_a,l_l,prozor,l_e,l_m=mainmenu()
+        
+              
         if keys[pygame.K_ESCAPE]:
-            l_a,l_l,prozor,l_e,l_m = mainmenu()
+            prozor=0
+            l_a,l_l,prozor,l_e,l_m=mainmenu()
             washolding=True
         if p1.health==0:
-            l_a,l_l,prozor,l_e,l_m = mainmenu()
+            prozor=-1
+            if info["highscore"]<minerala:
+                info["highscore"]=minerala
         draw_minerals(25,25,window,minerala)
         
         
@@ -849,7 +980,7 @@ while True:
                 if minerala>=35:
                     p1.health+=1
                     minerala-=35
-                    if p1.health==1:
+                    if p1.health==2:
                         p1.str=""
                 
         for i in range(len(l_b)):
