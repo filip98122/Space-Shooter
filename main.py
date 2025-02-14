@@ -65,7 +65,7 @@ keydict={
     
 }
 clock = pygame.time.Clock()
-WIDTH,HEIGHT = 765,765
+WIDTH,HEIGHT = 1540,900
 window = pygame.display.set_mode((WIDTH,HEIGHT))
 def highlight(width,height,x,y,mousePos):
     if mousePos[0] > x and mousePos[0] < x + width and mousePos[1] > y and mousePos[1] < y + height:
@@ -88,18 +88,18 @@ class Background:
         s.speedy=s.d
         if s.d == 5:
             s.image = pygame.image.load('star1.png')
-            s.width = s.image.get_width()/2.1
-            s.height = s.image.get_height()/2.1
+            s.width = s.image.get_width()*(HEIGHT/1000)
+            s.height = s.image.get_height()*(HEIGHT/1000)
             s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
         if s.d <= 3:
             s.image = pygame.image.load('star3.png')
-            s.width = s.image.get_width()
-            s.height = s.image.get_height()
+            s.width = s.image.get_width()*(HEIGHT/1000)
+            s.height = s.image.get_height()*(HEIGHT/1000)
             s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
         if s.d == 4:
             s.image = pygame.image.load('star2.png')
-            s.width = s.image.get_width()/1.8
-            s.height = s.image.get_height()/1.8
+            s.width = s.image.get_width()*(HEIGHT/1000)
+            s.height = s.image.get_height()*(HEIGHT/1000)
             s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
         if s.speedy==1:
             s.speedy+=1
@@ -494,19 +494,20 @@ class Laser:
             window.blit(s.scaled_img,(s.x,s.y))
 
 class Button:
-    def __init__(self,x,y,img,text,font,prozor,scale):
+    def __init__(self,x,y,img,text,font,prozor,scale,scale1):
         self.x=x
         self.y=y
-        if scale==None:
-            self.scale=2.8
-        else:
-            self.scale=scale
+        self.scale=2.8
+        self.scale=scale
+        self.scale1=scale1
         self.prozor = prozor
         self.text=text
         img1=pygame.image.load(f"{img}.png")
         self.width=img1.get_width()*self.scale
-        self.height=img1.get_height()*self.scale
+        self.height=img1.get_height()*self.scale1
         self.scaled_img=pygame.transform.scale(img1,(self.width,self.height))
+        self.x-=self.width/2
+        self.y-=self.height/2
         if text!="":
             self.text_surface = font.render(f"{text}", True, (15, 15, 15))
             self.width1=self.text_surface.get_width()
@@ -555,20 +556,31 @@ def write(info):
     ens(info)
 
 
+SCALE_MAIN_MENU_BUTTON=273.2142857142857
+SCALE_SETTINGS_BUTTON=127.5
 
-myfont1 = pygame.font.SysFont('s', 60)
+wsmmb=WIDTH/SCALE_MAIN_MENU_BUTTON
+hsmmb=HEIGHT/SCALE_MAIN_MENU_BUTTON
+wssb=WIDTH/SCALE_SETTINGS_BUTTON
+hssb=HEIGHT/SCALE_SETTINGS_BUTTON
+
+
+
+
+
+myfont1 = pygame.font.SysFont('s', int(HEIGHT/12.75))
 
 p1 = Player(100,550,0,0,9)
 
-myfont = pygame.font.SysFont('s', 70)
+myfont = pygame.font.SysFont('s', int(HEIGHT/10.92857142857143))
 
-lb=[Button(228.5,200,"start","",0,0,None),
-    Button(228.5,400,"settings","",0,0,None),
-    Button(228.5,600,"shop","",0,0,None),
-    Button(60,start-25,"zapucanje","Change shoot key from Space",myfont1,2,6),
-    Button(60,start+150,"zapucanje","Change go left key from a",myfont1,2,6),
-    Button(60,start+325,"zapucanje","Change go right key from d",myfont1,2,6),
-    Button(60,start+500,"zapucanje","Change heal key from h",myfont1,2,6)
+lb=[Button(WIDTH/2,HEIGHT/4,"start","",0,0,wsmmb,hsmmb),
+    Button(WIDTH/2,2*(HEIGHT/4),"settings","",0,0,wsmmb,hsmmb),
+    Button(WIDTH/2,3*(HEIGHT/4),"shop","",0,0,wsmmb,hsmmb),
+    Button(WIDTH/2,HEIGHT/6*1.5,"zapucanje","Change shoot key from Space",myfont1,2,wssb,hssb),
+    Button(WIDTH/2,HEIGHT/6*2.5,"zapucanje","Change go left key from a",myfont1,2,wssb,hssb),
+    Button(WIDTH/2,HEIGHT/6*3.5,"zapucanje","Change go right key from d",myfont1,2,wssb,hssb),
+    Button(WIDTH/2,HEIGHT/6*4.5,"zapucanje","Change heal key from h",myfont1,2,wssb,hssb)
     
 ]
 def draw_minerals(x,y,window,minerala):
@@ -608,8 +620,8 @@ class Store:
         window.blit(s.text_surface,(s.x+10,s.y+10))
 
 l_s=[
-    Store(100,100,"fire rate","Laser exhaust",100,7,-1),
-    Store(100,200,"damage","Laser damage",100,5,1)
+    Store(WIDTH/7.65,HEIGHT/7.65,"fire rate","Laser exhaust",100,7,-1),
+    Store(WIDTH/7.65,(HEIGHT/7.65)*2,"damage","Laser damage",100,5,1)
     
     
     
@@ -692,9 +704,9 @@ while True:
             txtsw1=txts1.get_width()
         
         window.fill("Black")
-        e = random.randint(1,10)
+        e = random.randint(1,2)
         if e == 1:
-            e = random.randint(10,728)
+            e = random.randint(10,int(728*2.013071895424837))
             l_b.append(Background(e))
         for i in range(len(l_b)):
             l_b[i].move_and_draw(window)
@@ -753,7 +765,7 @@ while True:
             washolding=True
         e = random.randint(1,10)
         if e == 1:
-            e = random.randint(10,728)
+            e = random.randint(10,int(728*2.013071895424837))
             l_b.append(Background(e))
         window.fill("Black")
         for i in range(len(l_b)):
@@ -792,7 +804,7 @@ while True:
             washolding=True
         e = random.randint(1,10)
         if e == 1:
-            e = random.randint(10,728)
+            e = random.randint(10,int(728*2.013071895424837))
             l_b.append(Background(e))
         window.fill("Black")
         for i in range(len(l_b)):
@@ -888,7 +900,7 @@ while True:
             washolding=False
         e = random.randint(1,10)
         if e == 1:
-            e = random.randint(10,728)
+            e = random.randint(10,int(728*2.013071895424837))
             l_b.append(Background(e))
         window.fill("Black")
         #part.draw(window)
@@ -929,7 +941,7 @@ while True:
             l_a.append(ast)
         e = random.randint(1,20)
         if e == 1:
-            e = random.randint(10,728)
+            e = random.randint(10,int(728*2.013071895424837))
             l_b.append(Background(e))
         window.fill("Black")
         for i in range(len(l_b)):
