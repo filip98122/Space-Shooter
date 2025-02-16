@@ -180,12 +180,12 @@ class Player:
         s.dx = 0
         s.cant_go_left = False
         s.cant_go_right = False
-        if s.x>=2:
+        if s.x>=0:
             if keys["left"]:
                 s.dx -= s.speed
         else:
             s.cant_go_left = True
-        if s.x+s.width<763:
+        if s.x+s.width<WIDTH:
             if keys["right"]:
                 s.dx += s.speed
         else:
@@ -348,7 +348,7 @@ class Mineral:
         if s.alive == True:
             s.y+=s.dy
             window.blit(s.scaled_img,(s.x,s.y))
-            if s.y >= 770:
+            if s.y >= HEIGHT:
                 s.alive = False
 l_m = []
 class Asteroid:
@@ -371,8 +371,8 @@ class Asteroid:
             s.image = pygame.image.load("asteroid4.png")
             
         
-        s.height = s.image.get_height()*2
-        s.width = s.image.get_width()*2
+        s.height = int(HEIGHT/16.6304347826087)
+        s.width = int(HEIGHT/16.6304347826087)
         s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
     def draw(s,window):
         if s.alive == True:
@@ -434,7 +434,7 @@ class Rotated_Laser:
         s.dx+=s.ddx
         s.y+=s.dy
         s.dy+=s.ddy
-        if s.x<=-100 or s.x>865:
+        if s.x-s.width<=0 or s.x>WIDTH:
             s.health=0
 
 
@@ -451,7 +451,7 @@ class Power_up_db:
     def move_and_draw(s,window):
         window.blit(s.scaled_img,(s.x,s.y))
         s.y+=s.speed
-        if s.y>=770:
+        if s.y>=HEIGHT:
             s.alive=False
 l_lr=[]
 
@@ -470,7 +470,7 @@ class Power_up_rb:
     def move_and_draw(s,window):
         s.y+=s.speed
         window.blit(s.scaled_img,(s.x,s.y))
-        if s.y>=770:
+        if s.y>=HEIGHT:
             s.alive=False
 
 class Laser:
@@ -608,7 +608,7 @@ class Store:
         s.op=op
         s.cost=cost
         s.img = pygame.image.load("buttons.png")
-        myfont = pygame.font.SysFont('B', 45)
+        myfont = pygame.font.SysFont('B', int(WIDTH/17))
         s.text_surface = myfont.render(f"{text}", True, (255, 255, 255))
         s.width1=s.text_surface.get_width()
         s.height1=s.text_surface.get_height()
@@ -704,9 +704,9 @@ while True:
             txtsw1=txts1.get_width()
         
         window.fill("Black")
-        e = random.randint(1,2)
+        e = random.randint(1,int(14780/WIDTH))
         if e == 1:
-            e = random.randint(10,int(728*2.013071895424837))
+            e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
             l_b.append(Background(e))
         for i in range(len(l_b)):
             l_b[i].move_and_draw(window)
@@ -763,9 +763,9 @@ while True:
         if keys[pygame.K_ESCAPE]:
             prozor=0
             washolding=True
-        e = random.randint(1,10)
+        e = random.randint(1,int(14780/WIDTH))
         if e == 1:
-            e = random.randint(10,int(728*2.013071895424837))
+            e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
             l_b.append(Background(e))
         window.fill("Black")
         for i in range(len(l_b)):
@@ -802,9 +802,9 @@ while True:
         if keys[pygame.K_ESCAPE]:
             prozor=0
             washolding=True
-        e = random.randint(1,10)
+        e = random.randint(1,int(14780/WIDTH))
         if e == 1:
-            e = random.randint(10,int(728*2.013071895424837))
+            e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
             l_b.append(Background(e))
         window.fill("Black")
         for i in range(len(l_b)):
@@ -898,9 +898,9 @@ while True:
                 exit()
         else:
             washolding=False
-        e = random.randint(1,10)
+        e = random.randint(1,int(14780/WIDTH))
         if e == 1:
-            e = random.randint(10,int(728*2.013071895424837))
+            e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
             l_b.append(Background(e))
         window.fill("Black")
         #part.draw(window)
@@ -935,13 +935,13 @@ while True:
         keydict["right"]=desno
         keydict["shot"]=pucaj
         keydict["heal"]=heluj
-        a_r = random.randint(1,20)
+        a_r = random.randint(1,int(14780/WIDTH))
         if a_r == 1:
-            ast = Asteroid(random.randint(25,700),-70)
+            ast = Asteroid(random.randint(0,WIDTH-int(HEIGHT/16.6304347826087)),-int((HEIGHT/16.6304347826087)+10))
             l_a.append(ast)
-        e = random.randint(1,20)
+        e = random.randint(1,int(14780/WIDTH))
         if e == 1:
-            e = random.randint(10,int(728*2.013071895424837))
+            e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
             l_b.append(Background(e))
         window.fill("Black")
         for i in range(len(l_b)):
@@ -973,7 +973,7 @@ while True:
         #laser
         q = 0
         for i in range(len(l_l)):
-            if l_l[q].health == 0:
+            if l_l[q].health <= 0:
                 del l_l[q]
                 q-=1
             q+=1
@@ -1073,7 +1073,7 @@ while True:
                         p1.str=""
                 
         for i in range(len(l_b)):
-            if l_b[r].y >= 765:
+            if l_b[r].y >= HEIGHT:
                 del l_b[r]
                 r-=1
             r+=1
@@ -1084,7 +1084,7 @@ while True:
                 l_a[i].draw(window)
         r = 0
         for i in range(len(l_a)):
-            if l_a[r].y >= 765:
+            if l_a[r].y >= HEIGHT:
                 del l_a[r]
                 r-=1
             r+=1
@@ -1223,7 +1223,7 @@ while True:
                 l_a[i].draw(window)
         r = 0
         for i in range(len(l_a)):
-            if l_a[r].y >= 765:
+            if l_a[r].y >= HEIGHT:
                 del l_a[r]
                 r-=1
             r+=1
