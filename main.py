@@ -66,6 +66,7 @@ keydict={
 }
 clock = pygame.time.Clock()
 WIDTH,HEIGHT = 1540,900
+
 window = pygame.display.set_mode((WIDTH,HEIGHT))
 def highlight(width,height,x,y,mousePos):
     if mousePos[0] > x and mousePos[0] < x + width and mousePos[1] > y and mousePos[1] < y + height:
@@ -113,25 +114,24 @@ class Player:
         s.y=y
         s.dx=dx
         s.time=time
-        s.cant_go_left = False
-        s.cant_go_right = False
         s.speed = speed
         s.health = 3
-        s.scale = 0.225
+        s.scale = HEIGHT/3400
         s.power_rb=0
         s.power_db=0
         s.time_missle=0
-        
+        s.dy=0
         
         s.img = pygame.image.load('1c.png')
-        s.width = s.img.get_width()*s.scale
         s.height = s.img.get_height()*s.scale
+        s.width = s.height
         e=pygame.transform.scale(s.img, (s.width, s.height))
         
         
         s.img = pygame.image.load('2.png')
         s.width = s.img.get_width()*s.scale
         s.height = s.img.get_height()*s.scale
+        s.width = s.height
         w=pygame.transform.scale(s.img, (s.width, s.height))
         
         
@@ -139,16 +139,19 @@ class Player:
         s.img = pygame.image.load('3.png')
         s.width = s.img.get_width()*s.scale
         s.height = s.img.get_height()*s.scale
+        s.width=s.height
         q=pygame.transform.scale(s.img, (s.width, s.height))
         
         s.img = pygame.image.load('1l.png')
         s.width = s.img.get_width()*s.scale
         s.height = s.img.get_height()*s.scale
+        s.width=s.height
         t=pygame.transform.scale(s.img, (s.width, s.height))
         
         s.img = pygame.image.load('1r.png')
         s.width = s.img.get_width()*s.scale
         s.height = s.img.get_height()*s.scale
+        s.width=s.height
         r=pygame.transform.scale(s.img, (s.width, s.height))
         s.str=""
         
@@ -178,18 +181,16 @@ class Player:
                 window.blit(self.dict[f'{self.health}{self.str}'],(self.x,self.y))
     def move(s,keys):
         s.dx = 0
-        s.cant_go_left = False
-        s.cant_go_right = False
+        s.dy=0
         if s.x>=0:
             if keys["left"]:
                 s.dx -= s.speed
-        else:
-            s.cant_go_left = True
         if s.x+s.width<WIDTH:
             if keys["right"]:
                 s.dx += s.speed
-        else:
-            s.cant_go_right = True
+        
+        
+        
         s.x+=s.dx
         if s.time>0:
             s.time-=1
@@ -271,7 +272,7 @@ part=Particle_System()
 class Missle:
     def __init__(s,x):
         s.x=x
-        s.y=490
+        s.y=p1.y
         s.angle=0
         s.img = pygame.image.load("particle.png")
         s.width = 336*0.075
@@ -284,10 +285,11 @@ class Missle:
         s.ddx=0
         s.ddy=0
         s.alive=True
-        s.width = 30
-        s.height = 30
+        s.width = HEIGHT/25.5
+        s.height = HEIGHT/25.5
         s.q=0.0075
         mindistince=1000000
+        s.y-=s.height
         for i in range(len(l_a)):
             if l_a[i].alive==True:
                 delx=l_a[i].x-s.x
@@ -341,8 +343,8 @@ class Mineral:
         s.alive = True
         s.dy = dy
         s.img = pygame.image.load("mineral.png")
-        s.width = 30
-        s.height = 30
+        s.width = HEIGHT/25.5
+        s.height = HEIGHT/25.5
         s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))
     def move_and_draw(s,window):
         if s.alive == True:
@@ -409,7 +411,7 @@ class Explosion:
             s.t-=1
 
 class Rotated_Laser:
-    def __init__(self,x,y,angle,health):
+    def __init__(self,x,y,angle,health,str=None):
         self.x=x
         self.y=y
         self.health=health
@@ -418,8 +420,8 @@ class Rotated_Laser:
         self.dy=-7
         self.ddy=-0.05
         self.img = pygame.image.load('laser.png')
-        self.width = self.img.get_width()*self.scale
-        self.height = self.img.get_height()*self.scale
+        self.width = (WIDTH/54.64285714285714)
+        self.height = (HEIGHT/19.125)
         self.scaled_img = pygame.transform.scale(self.img, (self.width, self.height))
         if self.angle==45:
             self.dx=-7
@@ -428,6 +430,11 @@ class Rotated_Laser:
             self.dx=7
             self.ddx=0.05
         self.rotated_img=pygame.transform.rotate(self.scaled_img,self.angle)
+        if p1.power_db>0:
+            if str==2:
+                self.y-=l_l[len(l_l)-1].width/2
+            else:
+                self.y+=l_l[len(l_l)-1].width/2
     def move_and_draw(s,window):
         window.blit(s.rotated_img,(s.x,s.y))
         s.x+=s.dx
@@ -445,8 +452,8 @@ class Power_up_db:
         s.speed=2.5
         s.alive=True
         s.image=pygame.image.load("powerupdb.png")
-        s.height = 45
-        s.width = 45
+        s.height = HEIGHT/17
+        s.width = HEIGHT/17
         s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
     def move_and_draw(s,window):
         window.blit(s.scaled_img,(s.x,s.y))
@@ -464,8 +471,8 @@ class Power_up_rb:
         s.speed=2.5
         s.alive=True
         s.image=pygame.image.load("poweruprb.png")
-        s.height = 45
-        s.width = 45
+        s.height = HEIGHT/17
+        s.width = HEIGHT/17
         s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
     def move_and_draw(s,window):
         s.y+=s.speed
@@ -474,17 +481,23 @@ class Power_up_rb:
             s.alive=False
 
 class Laser:
-    def __init__(self,x,health):
+    def __init__(self,x,health,str=None):
         self.x = x
-        self.y = 510
+        self.y = p1.y
         self.health = health
         self.dy = -7
         self.scale = 0.3*0.75
         self.ddy=-0.5
         self.img = pygame.image.load('laser.png')
-        self.width = self.img.get_width()*self.scale
-        self.height = self.img.get_height()*self.scale
+        self.width = (WIDTH/54.64285714285714)
+        self.height = (HEIGHT/19.125)
         self.scaled_img = pygame.transform.scale(self.img, (self.width, self.height))
+        self.y-=self.height
+        if p1.power_db>0:
+            if str==1:
+                self.x-=self.width
+        else:
+            self.x-=self.width/2
     def draw(s,window):
         if s.health >0:
             if s.y <= -53*0.75:
@@ -524,6 +537,8 @@ def mainmenu():
     global l_lr
     global l_prb
     global l_pdb
+    global l_missle
+    l_missle=[]
     l_pdb=[]
     global p1
     p1.power_db=0
@@ -585,13 +600,13 @@ lb=[Button(WIDTH/2,HEIGHT/4,"start","",0,0,wsmmb,hsmmb),
 ]
 def draw_minerals(x,y,window,minerala):
     img = pygame.image.load("mineral.png")
-    width = 30
-    height = 30
+    width = HEIGHT/25.5
+    height = HEIGHT/25.5
     scaled_img = pygame.transform.scale(img, (width, height))
     window.blit(scaled_img,(x,y))
-    myfont = pygame.font.SysFont('B', 45)
+    myfont = pygame.font.SysFont('B', int(HEIGHT/17))
     text_surface = myfont.render(f"{minerala}", True, (255, 255, 255))
-    window.blit(text_surface,(x+55,y))
+    window.blit(text_surface,(x+width+WIDTH/76.5,y))
 
 
 def prom(index):
@@ -629,6 +644,8 @@ l_s=[
     
     
 ]
+kojidole=info["kojidole"]
+kojig=info["kojig"]
 kojis=info["kojis"]
 kojil=info["kojil"]
 kojid=info["kojid"]
@@ -642,6 +659,35 @@ if q>=33 and q<=126:
     info["kojis"]=q
     kojis=q
     lb[3].text_surface = myfont1.render(f"Change shoot key from {char[kojis-34]}", True, (15, 15, 15))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 l_missle=[]
 
@@ -966,7 +1012,7 @@ while True:
             prozor=-1
             if info["highscore"]<minerala:
                 info["highscore"]=minerala
-        draw_minerals(25,25,window,minerala)
+        draw_minerals(HEIGHT/30.6,HEIGHT/30.6,window,minerala)
         
         
             
@@ -984,78 +1030,38 @@ while True:
                 del l_lr[q]
                 q-=1
             q+=1
+            
         if keydict["shot"]:
             if p1.time_missle<=0:
-                l_missle.append(Missle(p1.x+78*0.75))
+                l_missle.append(Missle(p1.x+p1.width/2))
                 p1.time_missle=info["fire rate missle"]
-            
-            
             if p1.time <= 0:
-                p1.time =info["fire rate"]
-                if len(l_l) >= 100:
-                    for i in range(len(l_l)):
-                        if l_l[i].health == 0:
-                            if p1.health == 2 or p1.health == 3:
-                                l_l[i] = Laser(p1.x+78*0.75,info["damage"])
-                            else:
-                                l_l[i] = Laser(p1.x+49*0.75,info["damage"])
-                else:
+                l1 = Laser(p1.x+p1.width/2,info["damage"])
+                if p1.power_db>0:
+                    l2=Laser(p1.x+p1.width/2,info["damage"],1)
+                    l_l.append(l2)
+                p1.time = info["fire rate"]
+                l_l.append(l1)
+                if p1.power_rb>0:
                     if p1.power_db==0:
-                        if p1.health == 2 or p1.health == 3:
-                            l1 = Laser(p1.x+58.5,info["damage"])
-                        else:
-                            if p1.str=="l":
-                                l1 = Laser(p1.x+36.79,info["damage"])
-                            else:
-                                l1 = Laser(p1.x+57,info["damage"])
-                        l_l.append(l1)
-                        if p1.power_rb>0:
-                            if p1.health>1 or p1.str=="c":
-                                l1r=Rotated_Laser(p1.x-10,p1.y-20,45,info["damage"])
-                                l_lr.append(l1r)
-                                l2r=Rotated_Laser(p1.x+90,p1.y-20,315,info["damage"])
-                                l_lr.append(l2r)
-                            else:
-                                if p1.str=="l":
-                                    l2r=Rotated_Laser(p1.x+90,p1.y-20,315,info["damage"])
-                                    l_lr.append(l2r)
-                                else:
-                                    l1r=Rotated_Laser(p1.x-10,p1.y-20,45,info["damage"])
-                                    l_lr.append(l1r)
+                        if p1.str=="r" or p1.str=="" or p1.str=="c":
+                            l1r=Rotated_Laser(p1.x-p1.width/12.9,p1.y-(p1.height/11.9)*2,45,info["damage"])
+                            l_lr.append(l1r)
+                        if p1.str=="l" or p1.str=="" or p1.str=="c":
+                            l1r=Rotated_Laser(p1.x+(p1.width/12.9)*9,p1.y-(p1.height/11.9)*2,315,info["damage"])
+                            l_lr.append(l1r)
                     else:
-                        if p1.health == 2 or p1.health == 3:
-                            l1 = Laser(p1.x+43.5,info["damage"])
-                            l2 = Laser(p1.x+74,info["damage"])
-                        else:
-                            if p1.str=="l":
-                                l1 = Laser(p1.x+22,info["damage"])
-                                l2 = Laser(p1.x+52,info["damage"])
-                            else:
-                                l1 = Laser(p1.x+42,info["damage"])
-                                l2 = Laser(p1.x+72,info["damage"])
-                        l_l.append(l1)
-                        l_l.append(l2)
-                        if p1.power_rb>0:
-                            if p1.str=="l":
-                                l2r=Rotated_Laser(p1.x+90,p1.y-5,315,info["damage"])
-                                l_lr.append(l2r)
-                                l2r=Rotated_Laser(p1.x+90,p1.y-35,315,info["damage"])
-                                l_lr.append(l2r)
-                            elif p1.str=="r":
-                                l1r=Rotated_Laser(p1.x-10,p1.y-5,45,info["damage"])
-                                l_lr.append(l1r)
-                                l1r=Rotated_Laser(p1.x-10,p1.y-35,45,info["damage"])
-                                l_lr.append(l1r)
-                            else:
-                                l1r=Rotated_Laser(p1.x-10,p1.y-5,45,info["damage"])
-                                l_lr.append(l1r)
-                                l1r=Rotated_Laser(p1.x-10,p1.y-35,45,info["damage"])
-                                l_lr.append(l1r)
-                                
-                                l2r=Rotated_Laser(p1.x+90,p1.y-5,315,info["damage"])
-                                l_lr.append(l2r)
-                                l2r=Rotated_Laser(p1.x+90,p1.y-35,315,info["damage"])
-                                l_lr.append(l2r)
+                        if p1.str=="r" or p1.str=="" or p1.str=="c":
+                            l1r=Rotated_Laser(p1.x-p1.width/12.9,(p1.y-(p1.height/11.9)*2)        ,45,info["damage"],1)
+                            l_lr.append(l1r)
+                            l1r=Rotated_Laser(p1.x-p1.width/12.9,(p1.y-(p1.height/11.9)*2)        ,45,info["damage"],2)
+                            l_lr.append(l1r)
+                        if p1.str=="l" or p1.str=="" or p1.str=="c":
+                            l1r=Rotated_Laser(p1.x+(p1.width/12.9)*9,(p1.y-(p1.height/11.9)*2)       ,315,info["damage"],1)
+                            l_lr.append(l1r)
+                            l1r=Rotated_Laser(p1.x+(p1.width/12.9)*9,(p1.y-(p1.height/11.9)*2)       ,315,info["damage"],2)
+                            l_lr.append(l1r)
+
         for i in range(len(l_l)):
             if l_l[i].health != 0:
                 l_l[i].draw(window)
