@@ -52,7 +52,7 @@ def checker(keys,index):
         if keys[key]:
             pressed = key
             break
-    if pressed!=0 and pressed!=kojih and pressed!=kojis and pressed!=kojid and pressed!=kojil:
+    if pressed!=0 and pressed!=kojih and pressed!=kojis and pressed!=kojid and pressed!=kojil and pressed!=kojig and pressed!=kojidole:
         return pressed
     else:
         return index
@@ -61,8 +61,9 @@ keydict={
     "shot":keys[pygame.K_SPACE],
     "left":keys[pygame.K_a],
     "right":keys[pygame.K_d],
-    "heal":keys[pygame.K_h]
-    
+    "heal":keys[pygame.K_h],
+    "up":keys[pygame.K_w],
+    "down":keys[pygame.K_s]
 }
 clock = pygame.time.Clock()
 WIDTH,HEIGHT = 1540,900
@@ -121,16 +122,16 @@ class Player:
         s.power_db=0
         s.time_missle=0
         s.dy=0
-        
+        scale=1
         s.img = pygame.image.load('1c.png')
-        s.height = s.img.get_height()*s.scale
+        s.height = int(int(HEIGHT/11.25)*scale)
         s.width = s.height
         e=pygame.transform.scale(s.img, (s.width, s.height))
         
         
         s.img = pygame.image.load('2.png')
         s.width = s.img.get_width()*s.scale
-        s.height = s.img.get_height()*s.scale
+        s.height = int(int(HEIGHT/11.25)*scale)
         s.width = s.height
         w=pygame.transform.scale(s.img, (s.width, s.height))
         
@@ -138,19 +139,19 @@ class Player:
         
         s.img = pygame.image.load('3.png')
         s.width = s.img.get_width()*s.scale
-        s.height = s.img.get_height()*s.scale
+        s.height = int(int(HEIGHT/11.25)*scale)
         s.width=s.height
         q=pygame.transform.scale(s.img, (s.width, s.height))
         
         s.img = pygame.image.load('1l.png')
         s.width = s.img.get_width()*s.scale
-        s.height = s.img.get_height()*s.scale
+        s.height = int(int(HEIGHT/11.25)*scale)
         s.width=s.height
         t=pygame.transform.scale(s.img, (s.width, s.height))
         
         s.img = pygame.image.load('1r.png')
         s.width = s.img.get_width()*s.scale
-        s.height = s.img.get_height()*s.scale
+        s.height = int(int(HEIGHT/11.25)*scale)
         s.width=s.height
         r=pygame.transform.scale(s.img, (s.width, s.height))
         s.str=""
@@ -188,9 +189,13 @@ class Player:
         if s.x+s.width<WIDTH:
             if keys["right"]:
                 s.dx += s.speed
-        
-        
-        
+        if s.y<HEIGHT-s.height:
+            if keys["down"]:
+                s.dy+=s.speed
+        if s.y>0:
+            if keys["up"]:
+                s.dy-=s.speed
+        s.y+=s.dy
         s.x+=s.dx
         if s.time>0:
             s.time-=1
@@ -420,8 +425,8 @@ class Rotated_Laser:
         self.dy=-7
         self.ddy=-0.05
         self.img = pygame.image.load('laser.png')
-        self.width = (WIDTH/54.64285714285714)
-        self.height = (HEIGHT/19.125)
+        self.width = self.img.get_width()*(HEIGHT/3400)
+        self.height = self.img.get_height()*(HEIGHT/3400)
         self.scaled_img = pygame.transform.scale(self.img, (self.width, self.height))
         if self.angle==45:
             self.dx=-7
@@ -489,8 +494,8 @@ class Laser:
         self.scale = 0.3*0.75
         self.ddy=-0.5
         self.img = pygame.image.load('laser.png')
-        self.width = (WIDTH/54.64285714285714)
-        self.height = (HEIGHT/19.125)
+        self.width = self.img.get_width()*(HEIGHT/3400)
+        self.height = self.img.get_height()*(HEIGHT/3400)
         self.scaled_img = pygame.transform.scale(self.img, (self.width, self.height))
         self.y-=self.height
         if p1.power_db>0:
@@ -585,18 +590,19 @@ hssb=HEIGHT/SCALE_SETTINGS_BUTTON
 
 myfont1 = pygame.font.SysFont('s', int(HEIGHT/12.75))
 
-p1 = Player(100,550,0,0,9)
+p1 = Player(100,550,0,0,HEIGHT/100)
 
 myfont = pygame.font.SysFont('s', int(HEIGHT/10.92857142857143))
 
 lb=[Button(WIDTH/2,HEIGHT/4,"start","",0,0,wsmmb,hsmmb),
     Button(WIDTH/2,2*(HEIGHT/4),"settings","",0,0,wsmmb,hsmmb),
     Button(WIDTH/2,3*(HEIGHT/4),"shop","",0,0,wsmmb,hsmmb),
-    Button(WIDTH/2,HEIGHT/6*1.5,"zapucanje","Change shoot key from Space",myfont1,2,wssb,hssb),
-    Button(WIDTH/2,HEIGHT/6*2.5,"zapucanje","Change go left key from a",myfont1,2,wssb,hssb),
-    Button(WIDTH/2,HEIGHT/6*3.5,"zapucanje","Change go right key from d",myfont1,2,wssb,hssb),
-    Button(WIDTH/2,HEIGHT/6*4.5,"zapucanje","Change heal key from h",myfont1,2,wssb,hssb)
-    
+    Button(WIDTH/2,HEIGHT/6*1,"zapucanje","Change shoot key from Space",myfont1,3,wssb,hssb),
+    Button(WIDTH/2,HEIGHT/6*2,"zapucanje","Change go left key from a",myfont1,3,wssb,hssb),
+    Button(WIDTH/2,HEIGHT/6*3,"zapucanje","Change go right key from d",myfont1,3,wssb,hssb),
+    Button(WIDTH/2,HEIGHT/6*4,"zapucanje","Change heal key from h",myfont1,3,wssb,hssb),
+    Button(WIDTH/2,HEIGHT/6*1,"zapucanje","Change go up key from w",myfont1,4,wssb,hssb),
+    Button(WIDTH/2,HEIGHT/6*2,"zapucanje","Change go down key from s",myfont1,4,wssb,hssb)
 ]
 def draw_minerals(x,y,window,minerala):
     img = pygame.image.load("mineral.png")
@@ -672,6 +678,76 @@ if q>=33 and q<=126:
 
 
 
+#zakasnije
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+q=kojig
+if q==32:
+    info["kojig"]=q
+    kojig=q
+    lb[7].text_surface = myfont1.render(f"Change go up key from Space", True, (15, 15, 15))
+if q>=33 and q<=126:
+    info["kojig"]=q
+    kojig=q
+    lb[7].text_surface = myfont1.render(f"Change go up key from {char[kojig-34]}", True, (15, 15, 15))
+
+q=kojidole
+if q==32:
+    info["kojidole"]=q
+    kojidole=q
+    lb[8].text_surface = myfont1.render(f"Change go down key from Space", True, (15, 15, 15))
+if q>=33 and q<=126:
+    info["kojidole"]=q
+    kojidole=q
+    lb[8].text_surface = myfont1.render(f"Change go down key from {char[kojidole-34]}", True, (15, 15, 15))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+buttonscrolltimes=1
+buttonscrollloc=0
+def button_scroll():
+    window.blit(imgs,(WIDTH/2-width/2,lb[6].y+lb[6].height))
+    window.blit(text_surface,(WIDTH/2-width1/2,lb[6].y+lb[6].height+height/2-height1/2))
+    #WIDTH/2,HEIGHT/6*5.5
+
+img=pygame.image.load("buttons.png")
+text_surface = myfont1.render(f"Next page", True, (0,0,0))
+width=lb[3].width
+height=lb[3].height
+width1=text_surface.get_width()
+height1=text_surface.get_height()
+imgs=pygame.transform.scale(img,(width,height))
+qqqqqqqq=1
+
+
+
+
 
 
 
@@ -712,7 +788,7 @@ if q>=33 and q<=126:
     kojid=q
     info["kojid"]=q
     lb[5].text_surface = myfont1.render(f"Change go right key from {char[kojid-34]}", True, (15, 15, 15))
-
+button_scrollhold=False
 
 l_pdb=[]
 l_prb=[]
@@ -729,6 +805,8 @@ prom(3)
 prom(4)
 prom(5)
 prom(6)
+prom(7)
+prom(8)
 qq=1
 ukupnom=info["minerala"]
 minerala = 0
@@ -798,45 +876,6 @@ while True:
 #STORE CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||||
 #STORE CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||||
 #STORE CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||||
-    if prozor==3:
-        keys = pygame.key.get_pressed()
-        events = pygame.event.get()
-        mouseState = pygame.mouse.get_pressed()
-        mousePos = pygame.mouse.get_pos()
-        for event in events:
-            if event.type == pygame.QUIT:
-                prozor=0
-        if keys[pygame.K_ESCAPE]:
-            prozor=0
-            washolding=True
-        e = random.randint(1,int(14780/WIDTH))
-        if e == 1:
-            e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
-            l_b.append(Background(e))
-        window.fill("Black")
-        for i in range(len(l_b)):
-            l_b[i].move_and_draw(window)
-        for i in range(len(lb)):
-            if lb[i].prozor==3:
-                lb[i].draw(window)
-        for i in range(len(l_s)):
-            l_s[i].draw(window)
-            if button_colision(l_s[i].width,l_s[i].height,l_s[i].x,l_s[i].y,mousePos,mouseState):
-                if ukupnom>=l_s[i].cost:
-                    if l_s[i].op<0:
-                        if l_s[i].quantity<info[l_s[i].index]:
-                            ukupnom-=l_s[i].cost
-                            info[l_s[i].index]+=l_s[i].op
-                    else:
-                        if l_s[i].quantity>info[l_s[i].index]:
-                            ukupnom-=l_s[i].cost
-                            info[l_s[i].index]+=l_s[i].op
-#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
-#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
-#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
-#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
-#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
-#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
     if prozor==2:
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
@@ -858,6 +897,130 @@ while True:
         for i in range(len(lb)):
             if lb[i].prozor==2:
                 lb[i].draw(window)
+        for i in range(len(l_s)):
+            l_s[i].draw(window)
+            if button_colision(l_s[i].width,l_s[i].height,l_s[i].x,l_s[i].y,mousePos,mouseState):
+                if ukupnom>=l_s[i].cost:
+                    if l_s[i].op<0:
+                        if l_s[i].quantity<info[l_s[i].index]:
+                            ukupnom-=l_s[i].cost
+                            info[l_s[i].index]+=l_s[i].op
+                    else:
+                        if l_s[i].quantity>info[l_s[i].index]:
+                            ukupnom-=l_s[i].cost
+                            info[l_s[i].index]+=l_s[i].op
+#SETTINGS PAGE 2 IS BELOW |||||||||||||||||||||||||||||||||||||||||
+#SETTINGS PAGE 2 IS BELOW |||||||||||||||||||||||||||||||||||||||||
+#SETTINGS PAGE 2 IS BELOW |||||||||||||||||||||||||||||||||||||||||
+#SETTINGS PAGE 2 IS BELOW |||||||||||||||||||||||||||||||||||||||||
+#SETTINGS PAGE 2 IS BELOW |||||||||||||||||||||||||||||||||||||||||
+#SETTINGS PAGE 2 IS BELOW |||||||||||||||||||||||||||||||||||||||||
+    if prozor==4:
+        keys = pygame.key.get_pressed()
+        events = pygame.event.get()
+        mouseState = pygame.mouse.get_pressed()
+        mousePos = pygame.mouse.get_pos()
+        for event in events:
+            if event.type == pygame.QUIT:
+                prozor=0
+        if keys[pygame.K_ESCAPE]:
+            prozor=0
+            washolding=True
+        e = random.randint(1,int(14780/WIDTH))
+        if e == 1:
+            e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
+            l_b.append(Background(e))
+        window.fill("Black")
+        for i in range(len(l_b)):
+            l_b[i].move_and_draw(window)
+        for i in range(len(lb)):
+            if lb[i].prozor==4:
+                lb[i].draw(window)
+        button_scroll()
+        if button_colision(width,height,WIDTH/2-width/2,lb[6].y+lb[6].height,mousePos,mouseState):
+            if button_scrollhold==False:
+                prozor+=1
+                buttonscrollloc+=1
+                button_scrollhold=True
+        else:
+            button_scrollhold=False
+        if buttonscrollloc>buttonscrolltimes:
+            prozor=3
+            buttonscrollloc=0
+        if buttonscrollloc<0:
+            prozor=3+buttonscrolltimes
+        
+        #GO UP CODE IS BELOW ||||||||||||||||||||||||||||||||||||||
+        #GO UP CODE IS BELOW ||||||||||||||||||||||||||||||||||||||
+        #GO UP CODE IS BELOW ||||||||||||||||||||||||||||||||||||||
+        if button_colision(lb[7].width,lb[7].height,lb[7].x,lb[7].y,mousePos,mouseState):
+            q = checker(keys,kojig)
+            if q==32:
+                info["kojig"]=q
+                kojig=q
+                lb[7].text_surface = myfont1.render(f"Change go up key from Space", True, (15, 15, 15))
+                prom(7)
+            if q>=33 and q<=126:
+                info["kojig"]=q
+                kojig=q
+                lb[7].text_surface = myfont1.render(f"Change go up key from {char[kojig-34]}", True, (15, 15, 15))
+                prom(7)
+        
+        #GO DOWN CODE IS BELOW ||||||||||||||||||||||||||||||||||||
+        #GO DOWN CODE IS BELOW ||||||||||||||||||||||||||||||||||||
+        #GO DOWN CODE IS BELOW ||||||||||||||||||||||||||||||||||||
+        if button_colision(lb[8].width,lb[8].height,lb[8].x,lb[8].y,mousePos,mouseState):
+            q = checker(keys,kojidole)
+            if q==32:
+                info["kojidole"]=q
+                kojidole=q
+                lb[8].text_surface = myfont1.render(f"Change go up key from Space", True, (15, 15, 15))
+                prom(8)
+            if q>=33 and q<=126:
+                info["kojidole"]=q
+                kojidole=q
+                lb[8].text_surface = myfont1.render(f"Change go up key from {char[kojidole-34]}", True, (15, 15, 15))
+                prom(8)
+#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
+    if prozor==3:
+        keys = pygame.key.get_pressed()
+        events = pygame.event.get()
+        mouseState = pygame.mouse.get_pressed()
+        mousePos = pygame.mouse.get_pos()
+        for event in events:
+            if event.type == pygame.QUIT:
+                prozor=0
+        if keys[pygame.K_ESCAPE]:
+            prozor=0
+            washolding=True
+        e = random.randint(1,int(14780/WIDTH))
+        if e == 1:
+            e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
+            l_b.append(Background(e))
+        window.fill("Black")
+        for i in range(len(l_b)):
+            l_b[i].move_and_draw(window)
+        for i in range(len(lb)):
+            if lb[i].prozor==3:
+                lb[i].draw(window)
+        button_scroll()
+        if button_colision(width,height,WIDTH/2-width/2,lb[6].y+lb[6].height,mousePos,mouseState):
+            if button_scrollhold==False:
+                prozor+=1
+                buttonscrollloc+=1
+                button_scrollhold=True
+        else:
+            button_scrollhold=False
+        if buttonscrollloc>buttonscrolltimes:
+            prozor=3
+            buttonscrollloc=0
+        if buttonscrollloc<0:
+            prozor=3+buttonscrolltimes
     #SHOOT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||||
     #SHOOT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||||
     #SHOOT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||||
@@ -873,9 +1036,9 @@ while True:
                 kojis=q
                 lb[3].text_surface = myfont1.render(f"Change shoot key from {char[kojis-34]}", True, (15, 15, 15))
                 prom(3)
-    #GOING LEFT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||
-    #GOING LEFT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||
-    #GOING LEFT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||
+    #GOING LEFT CODE BELOW |||||||||||||||||||||||||||||||||||||||||
+    #GOING LEFT CODE BELOW |||||||||||||||||||||||||||||||||||||||||
+    #GOING LEFT CODE BELOW |||||||||||||||||||||||||||||||||||||||||
         if button_colision(lb[4].width,lb[4].height,lb[4].x,lb[4].y,mousePos,mouseState):
             q = checker(keys,kojil)
             if q==32:
@@ -888,9 +1051,9 @@ while True:
                 info["kojil"]=q
                 lb[4].text_surface = myfont1.render(f"Change go left key from {char[kojil-34]}", True, (15, 15, 15))
                 prom(4)
-    #GOING RIGHT CODE BELOW |||||||||||||||||||||||||||||||||||||||||||
-    #GOING RIGHT CODE BELOW |||||||||||||||||||||||||||||||||||||||||||
-    #GOING RIGHT CODE BELOW |||||||||||||||||||||||||||||||||||||||||||
+    #GOING RIGHT CODE BELOW ||||||||||||||||||||||||||||||||||||||||
+    #GOING RIGHT CODE BELOW ||||||||||||||||||||||||||||||||||||||||
+    #GOING RIGHT CODE BELOW ||||||||||||||||||||||||||||||||||||||||
         if button_colision(lb[5].width,lb[5].height,lb[5].x,lb[5].y,mousePos,mouseState):
             q = checker(keys,kojid)
             if q==32:
@@ -903,9 +1066,9 @@ while True:
                 info["kojid"]=q
                 lb[5].text_surface = myfont1.render(f"Change go right key from {char[kojid-34]}", True, (15, 15, 15))
                 prom(5)
-    #HEALING CODE BELOW |||||||||||||||||||||||||||||||||||||||||||||||
-    #HEALING CODE BELOW |||||||||||||||||||||||||||||||||||||||||||||||
-    #HEALING CODE BELOW |||||||||||||||||||||||||||||||||||||||||||||||
+    #HEALING CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||
+    #HEALING CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||
+    #HEALING CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||
         if button_colision(lb[6].width,lb[6].height,lb[6].x,lb[6].y,mousePos,mouseState):
             q = checker(keys,kojih)
             if q==32:
@@ -921,12 +1084,12 @@ while True:
     
 
     
-    #MAIN MENU CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||
-    #MAIN MENU CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||
-    #MAIN MENU CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||
-    #MAIN MENU CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||
-    #MAIN MENU CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||
-    #MAIN MENU CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||
+    #MAIN MENU CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
+    #MAIN MENU CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
+    #MAIN MENU CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
+    #MAIN MENU CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
+    #MAIN MENU CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
+    #MAIN MENU CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
     if prozor==0:
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
@@ -960,9 +1123,9 @@ while True:
         if button_colision(lb[0].width,lb[0].height,lb[0].x,lb[0].y,mousePos,mouseState):
             prozor=1
         if button_colision(lb[1].width,lb[1].height,lb[1].x,lb[1].y,mousePos,mouseState):
-            prozor=2
-        if button_colision(lb[2].width,lb[2].height,lb[2].x,lb[2].y,mousePos,mouseState):
             prozor=3
+        if button_colision(lb[2].width,lb[2].height,lb[2].x,lb[2].y,mousePos,mouseState):
+            prozor=2
     #GAME CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||||||
     #GAME CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||||||
     #GAME CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||||||
@@ -977,10 +1140,31 @@ while True:
         desno=keys[kojid]
         pucaj=keys[kojis]
         heluj=keys[kojih]
+        gore=keys[kojig]
+        dole=keys[kojidole]
         keydict["left"]=levo
         keydict["right"]=desno
         keydict["shot"]=pucaj
         keydict["heal"]=heluj
+        keydict["up"]=gore
+        keydict["down"]=dole
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         a_r = random.randint(1,int(14780/WIDTH))
         if a_r == 1:
             ast = Asteroid(random.randint(0,WIDTH-int(HEIGHT/16.6304347826087)),-int((HEIGHT/16.6304347826087)+10))
