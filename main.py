@@ -122,38 +122,34 @@ class Player:
         s.power_db=0
         s.time_missle=0
         s.dy=0
-        scale=1
-        s.img = pygame.image.load('1c.png')
-        s.height = int(int(HEIGHT/11.25)*scale)
+        scale=HEIGHT/5940.594059405941
+        img = pygame.image.load('1c.png')
+        s.height = img.get_height()*scale
         s.width = s.height
-        e=pygame.transform.scale(s.img, (s.width, s.height))
+        e=pygame.transform.scale(img, (s.width, s.height))
         
         
-        s.img = pygame.image.load('2.png')
-        s.width = s.img.get_width()*s.scale
-        s.height = int(int(HEIGHT/11.25)*scale)
+        img = pygame.image.load('2.png')
+        s.height = img.get_height()*scale
         s.width = s.height
-        w=pygame.transform.scale(s.img, (s.width, s.height))
+        w=pygame.transform.scale(img, (s.width, s.height))
         
         
         
-        s.img = pygame.image.load('3.png')
-        s.width = s.img.get_width()*s.scale
-        s.height = int(int(HEIGHT/11.25)*scale)
+        img = pygame.image.load('3.png')
+        s.height = img.get_height()*scale
         s.width=s.height
-        q=pygame.transform.scale(s.img, (s.width, s.height))
+        q=pygame.transform.scale(img, (s.width, s.height))
         
-        s.img = pygame.image.load('1l.png')
-        s.width = s.img.get_width()*s.scale
-        s.height = int(int(HEIGHT/11.25)*scale)
+        img = pygame.image.load('1l.png')
+        s.height = img.get_height()*scale
         s.width=s.height
-        t=pygame.transform.scale(s.img, (s.width, s.height))
+        t=pygame.transform.scale(img, (s.width, s.height))
         
-        s.img = pygame.image.load('1r.png')
-        s.width = s.img.get_width()*s.scale
-        s.height = int(int(HEIGHT/11.25)*scale)
+        img = pygame.image.load('1r.png')
+        s.height = img.get_height()*scale
         s.width=s.height
-        r=pygame.transform.scale(s.img, (s.width, s.height))
+        r=pygame.transform.scale(img, (s.width, s.height))
         s.str=""
         
         
@@ -575,6 +571,7 @@ def write(info):
     info["minerala"]=0
     ens(info)
 
+#info = {'minerala': 0, 'username': '', 'kojis': 32, 'kojil': 97, 'kojid': 100, 'kojih': 104, 'fire rate': 20, 'highscore': 0, 'damage': 1, 'fire rate missle': 30, 'kojidole': 115, 'kojig': 119}
 
 SCALE_MAIN_MENU_BUTTON=273.2142857142857
 SCALE_SETTINGS_BUTTON=127.5
@@ -638,12 +635,12 @@ class Store:
         s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))
     def draw(s,window):
         window.blit(s.scaled_img,(s.x,s.y))
-        window.blit(s.text_surface,(s.x+10,s.y+10))
+        window.blit(s.text_surface,(s.x+s.width/2-s.width1/2,s.y+s.height/2-s.height1/2))
 
 l_s=[
     Store(WIDTH/7.65,HEIGHT/7.65,"fire rate","Laser exhaust",100,7,-1),
-    Store(WIDTH/7.65,(HEIGHT/7.65)*2,"damage","Laser damage",100,5,1)
-    
+    Store(WIDTH/7.65,(HEIGHT/7.65)*2,"damage","Laser damage",100,5,1),
+    Store(WIDTH/7.65,(HEIGHT/7.65)*3,"damage","Missle exhaust",100,18,-1)
     
     
     
