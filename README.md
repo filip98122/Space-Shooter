@@ -5,6 +5,6 @@ Good entertainment with no wifi-requerments and no ads. Best way to kill time AN
 
 Here's what your spaceship looks like:
 
-<img src="screenshots/picture1.png">
-
-
+<img src="screenshots/GAME.png">
+<img src="screenshots/MAINMENU.png">
+<img src="screenshots/SETTINGS.png">

@@ -26,6 +26,22 @@ def end():
     decrypted_data1=json.loads(decrypted_data.decode('utf-8'))
     return decrypted_data1
 
+def Vector_Normalization(x1, y1, x2, y2):
+    # Calculate dx and dy with direction
+    distancex = x2 - x1
+    distancey = y2 - y1
+    vector_lenght=math.sqrt(distancex*distancex+distancey*distancey)
+    distancex=distancex/vector_lenght
+    distancey=distancey/vector_lenght
+    distancex*=HEIGHT/150
+    distancey*=HEIGHT/150                                                                                                                                                                        
+    return distancex,distancey
+
+    
+    
+    
+    
+    
 
 
 
@@ -39,7 +55,7 @@ def collison(x1,y1,r1,x2,y2,r2):
         return False
     else:
         return True
-def colision1(rect1 : pygame.Rect,rect2):
+def collision1(rect1 : pygame.Rect,rect2):
     if rect1.colliderect(rect2):
         return True
     return False
@@ -67,7 +83,6 @@ keydict={
 }
 clock = pygame.time.Clock()
 WIDTH,HEIGHT = 1540,900
-
 window = pygame.display.set_mode((WIDTH,HEIGHT))
 def highlight(width,height,x,y,mousePos):
     if mousePos[0] > x and mousePos[0] < x + width and mousePos[1] > y and mousePos[1] < y + height:
@@ -76,18 +91,20 @@ def highlight(width,height,x,y,mousePos):
         return False
 
 def button_colision(width,height,x,y,mousePos,mouseState):
+    """Collides the clicking of the would-be button given"""
     if mousePos[0] > x and mousePos[0] < x + width and mousePos[1] > y and mousePos[1] < y + height and mouseState[0] == True:
         return True
     else:
         return False
 
 class Background:
+    """Moves and draws the background"""
     def __init__(s,x):
         s.x = x
         s.y = 0
         s.scale = 9
         s.d = random.randint(1,5)
-        s.speedy=s.d
+        s.speedy=(HEIGHT/765)*s.d
         if s.d == 5:
             s.image = pygame.image.load('star1.png')
             s.width = s.image.get_width()*(HEIGHT/1000)
@@ -110,6 +127,7 @@ class Background:
         window.blit(s.scaled_img,(s.x,s.y))
 l_b = []
 class Player:
+    """Moves and draws the player"""
     def __init__(s,x,y,dx,time,speed):
         s.x =x
         s.y=y
@@ -169,7 +187,7 @@ class Player:
 
         
     def draw(self,window):
-        if self.health==0:
+        if self.health<=0:
             return
         else:
             if self.health!=1:
@@ -207,26 +225,30 @@ class Player:
             s.power_db-=1
 
 class Particle:
-    def __init__(s,x,y,lifetime,dx,dy,width,height):
+    def __init__(s,x,y,lifetime,dx,dy):
         s.x=x
         s.y=y
         s.lifetime=lifetime
         s.dx=dx
         s.dy=dy
-        s.ddx=0
-        s.ddy=0.1
-        scale=0.3
-        s.img=pygame.image.load("particle.png")
-        s.width=s.img.get_width()*scale
-        s.height=s.img.get_height()*scale
-        s.scldimg=pygame.transform.scale(s.img,(s.width,s.height))
-    def draw(s,window):
-        window.blit(s.scldimg,(s.x,s.y))
-        
+        s.distancex=0
+        s.distancey=0
+        s.distance=0
+        s.radius=HEIGHT/(16.6304347826087*5)
+        s.color = (random.randint(118, 138), random.randint(0, 20), random.randint(118, 138))
+        s.alpha = random.randint(50, 100)
+    def draw(self, screen):
+        particle_surface = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA) #Create transparent surface.
+        pygame.draw.circle(particle_surface, self.color + (self.alpha,), (self.radius, self.radius), self.radius) #draw circle with alpha.
+        screen.blit(particle_surface, (int(self.x - self.radius), int(self.y - self.radius))) # blit surface to main screen.
+        self.alpha-=0.1
+        self.alpha = max(0, self.alpha) # Example of decreasing alpha over time.
 class Particle_System:
+    """Updates every partcle movment"""
     def __init__(s):
         s.l_p=[]
-        
+        s.gravity=0.08
+        s.attractor=0
     def draw(s,window):
         for i in range(len(s.l_p)):
             s.l_p[i].draw(window)
@@ -234,13 +256,13 @@ class Particle_System:
     
     def update(s):
         # Spawn new particles if needed
-        probpart=random.randint(1,5)
+        probpart=random.randint(1,3)
         if probpart==1:
             w=random.randint(1,3)
             qqq=random.randint(1,2)
             if qqq==1:
                 w*=-1
-            s.l_p.append(Particle(375,50,75,w,4,100,100))
+            s.l_p.append(Particle(WIDTH/2+WIDTH/2.566666666666667,HEIGHT/2-WIDTH/5.133333333333333,250,w,-10))
         
         
         count=0
@@ -251,22 +273,59 @@ class Particle_System:
             count+=1
         
         # Movement
+        for i in range(len(l_attractors)):
+            if l_attractors[i].prozor==prozor:
+                for j in range(len(s.l_p)):
+                    s.l_p[j].distancex=l_attractors[i].x-s.l_p[j].x
+                    s.l_p[j].distancey=l_attractors[i].y-s.l_p[j].y
+                    s.l_p[j].distance=math.sqrt(s.l_p[j].distancex*s.l_p[j].distancex+s.l_p[j].distancey*s.l_p[j].distancey)
+                    s.l_p[j].dx+=(s.l_p[j].distancex*(HEIGHT/1092857.142857143))
+                    s.l_p[j].dy+=(s.l_p[j].distancey*(HEIGHT/1092857.142857143))
+                #l_attractors[i].draw(window)
+                if s.attractor==0:
+                    """
+                    for ii in range(len(l_attractors)):
+                        l_attractors[ii].x=random.randint(0,WIDTH)
+                        l_attractors[ii].y=random.randint(0,HEIGHT)
+                    """
+                    s.attractor=240
         for i in range(len(s.l_p)):
             if s.l_p[i].lifetime>=1:
+                s.l_p[i].dy+=s.gravity
                 s.l_p[i].x+=s.l_p[i].dx
                 s.l_p[i].y+=s.l_p[i].dy
-                s.l_p[i].dy+=s.l_p[i].ddy
-                if s.l_p[i].y>HEIGHT+10:
-                    s.l_p[i].lifetime=0
                 
                 s.l_p[i].lifetime-=1
+        s.attractor-=1
 
 
-
-
-
-
-
+class Attractor:
+    def __init__(s,x,y,prozor):
+        s.x=x
+        s.y=y
+        s.prozor=prozor
+        s.img = pygame.image.load("particle_red.png")
+        s.width = HEIGHT/25.5
+        s.height = HEIGHT/25.5
+        s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))
+        s.x+=s.width/2
+        s.y+=s.height/2
+    def draw(s,window):
+        window.blit(s.scaled_img,(s.x-s.width/2,s.y-s.height/2))
+l_attractors=[Attractor(WIDTH/2,HEIGHT/2,0),
+              Attractor(WIDTH/2,HEIGHT/2,0)
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+]
+#l_attractors=[]
 
 part=Particle_System()
 
@@ -357,17 +416,40 @@ class Mineral:
             window.blit(s.scaled_img,(s.x,s.y))
             if s.y >= HEIGHT:
                 s.alive = False
+
+class Green_Mineral:
+    def __init__(s,x,y,dy):
+        s.x = x
+        s.y = y
+        s.alive = True
+        s.dy = dy
+        s.img = pygame.image.load("green mineral.png")
+        s.width = HEIGHT/25.5
+        s.height = HEIGHT/25.5
+        s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))
+        s.x-=s.width/2
+    def move_and_draw(s,window):
+        global whenwin
+        if s.alive == True:
+            s.y+=s.dy
+            window.blit(s.scaled_img,(s.x,s.y))
+            if s.y >= HEIGHT:
+                s.alive = False
+                whenwin=300
+
+
+
 l_m = []
 class Asteroid:
-    def __init__(s,x,y):
+    def __init__(s,x,y,alive):
         s.x = x
         s.y = y
         s.drop=True
         s.strana=random.randint(0,1)
-        s.alive = True
+        s.alive =alive
         s.Time_from_death = 70
         s.img_choice = random.randint(1,4)
-        s.speed = random.randint(2,5)
+        s.speed = random.randint(int(HEIGHT/382.5),int(HEIGHT/153))
         if s.img_choice == 1:
             s.image = pygame.image.load("asteroid1.png")
         if s.img_choice == 2:
@@ -382,7 +464,7 @@ class Asteroid:
         s.width = int(HEIGHT/16.6304347826087)
         s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
     def draw(s,window):
-        if s.alive == True:
+        if s.alive >= 0:
             window.blit(s.scaled_img,(s.x,s.y))
             s.y+=s.speed
 
@@ -422,18 +504,18 @@ class Rotated_Laser:
         self.health=health
         self.angle=angle
         self.scale=0.3*0.75
-        self.dy=-7
-        self.ddy=-0.05
+        self.dy=-HEIGHT/109.2857142857143
+        self.ddy=-HEIGHT/15300
         self.img = pygame.image.load('laser.png')
         self.width = self.img.get_width()*(HEIGHT/3400)
         self.height = self.img.get_height()*(HEIGHT/3400)
         self.scaled_img = pygame.transform.scale(self.img, (self.width, self.height))
         if self.angle==45:
-            self.dx=-7
-            self.ddx=-0.05
+            self.dx=-HEIGHT/109.2857142857143
+            self.ddx=-HEIGHT/15300
         else:
-            self.dx=7
-            self.ddx=0.05
+            self.dx=HEIGHT/109.2857142857143
+            self.ddx=HEIGHT/15300
         self.rotated_img=pygame.transform.rotate(self.scaled_img,self.angle)
         if p1.power_db>0:
             if str==2:
@@ -446,7 +528,7 @@ class Rotated_Laser:
         s.dx+=s.ddx
         s.y+=s.dy
         s.dy+=s.ddy
-        if s.x-s.width<=0 or s.x>WIDTH:
+        if s.x+s.width<=0 or s.x>WIDTH:
             s.health=0
 
 
@@ -454,7 +536,7 @@ class Power_up_db:
     def __init__(s,x,y):
         s.x=x
         s.y=y
-        s.speed=2.5
+        s.speed=HEIGHT/306
         s.alive=True
         s.image=pygame.image.load("powerupdb.png")
         s.height = HEIGHT/17
@@ -473,7 +555,7 @@ class Power_up_rb:
     def __init__(s,x,y):
         s.x=x
         s.y=y
-        s.speed=2.5
+        s.speed=HEIGHT/306
         s.alive=True
         s.image=pygame.image.load("poweruprb.png")
         s.height = HEIGHT/17
@@ -490,9 +572,9 @@ class Laser:
         self.x = x
         self.y = p1.y
         self.health = health
-        self.dy = -7
         self.scale = 0.3*0.75
-        self.ddy=-0.5
+        self.dy=-HEIGHT/109.2857142857143
+        self.ddy=-HEIGHT/15300
         self.img = pygame.image.load('laser.png')
         self.width = self.img.get_width()*(HEIGHT/3400)
         self.height = self.img.get_height()*(HEIGHT/3400)
@@ -530,10 +612,65 @@ class Button:
             self.text_surface = font.render(f"{text}", True, (15, 15, 15))
             self.width1=self.text_surface.get_width()
             self.height1=self.text_surface.get_height()
+            self.x1=self.x+((self.width-self.width1)//2)
+            self.y1=self.y+((self.height-self.height1)//2)
     def draw(self,window):
         window.blit(self.scaled_img,(self.x,self.y))
         if self.text!="":
-            window.blit(self.text_surface,(self.x+((self.width-self.width1)//2),self.y+((self.height-self.height1)//2)))
+            window.blit(self.text_surface,(self.x1,self.y1))
+
+
+class Boss:
+    def __init__(s,x,y):
+        s.x=x
+        s.y=y
+        s.scale=HEIGHT/900
+        img1=pygame.image.load(f"boss.png")
+        s.width=img1.get_width()*s.scale
+        s.height=img1.get_height()*s.scale
+        s.scaled_img=pygame.transform.scale(img1,(s.width,s.height))
+        s.shoot=0
+        s.x-=s.width/2
+        s.health = 75
+    def general(s,window):
+        window.blit(s.scaled_img,(s.x,s.y))
+        if s.shoot==0:
+            s.make_fireball()
+            s.shoot=50
+        else:
+            s.shoot-=1
+    def make_fireball(s):
+        l_f.append(Fireball(s.x+s.width/2,s.y+s.height))
+        
+l_f=[]
+
+class Fireball:
+    def __init__(s,x,y):
+        s.health=1
+        s.x=x
+        s.y=y
+        s.scale=HEIGHT/1800
+        img1=pygame.image.load(f"fireball.png")
+        s.width=img1.get_width()*s.scale
+        s.height=img1.get_height()*s.scale
+        s.scaled_img=pygame.transform.scale(img1,(s.width,s.height))
+        s.dx,s.dy=Vector_Normalization(s.x+s.width/2,s.y+s.height/2,p1.x+p1.width/2,p1.y+p1.height/2)
+        s.x-=s.width/2
+    def general(s,window):
+        window.blit(s.scaled_img,(s.x,s.y))
+        s.x+=s.dx
+        s.y+=s.dy
+        if s.x+s.width<=0 or s.x>=WIDTH or s.y>=HEIGHT or s.y+s.height<=0:
+            s.health=0
+
+
+
+
+boss = Boss(WIDTH/2,100)
+
+
+
+
 l_l = []
 start=50
 def mainmenu():
@@ -542,6 +679,10 @@ def mainmenu():
     global l_lr
     global l_prb
     global l_pdb
+    global boss
+    boss = Boss(WIDTH/2,100)
+    global l_f
+    l_f=[]
     global l_missle
     l_missle=[]
     l_pdb=[]
@@ -590,7 +731,7 @@ hssb=HEIGHT/SCALE_SETTINGS_BUTTON
 
 myfont1 = pygame.font.SysFont('s', int(HEIGHT/12.75))
 
-p1 = Player(100,550,0,0,HEIGHT/100)
+p1 = Player(100,550,0,0,WIDTH/160)
 
 myfont = pygame.font.SysFont('s', int(HEIGHT/10.92857142857143))
 
@@ -618,7 +759,7 @@ def draw_minerals(x,y,window,minerala):
 def prom(index):
     lb[index].width1=lb[index].text_surface.get_width()
     lb[index].height1=lb[index].text_surface.get_height()
-
+najvecivreme=0
 
 class Store:
     def __init__(s,x,y,index,text,cost,quantity,op):
@@ -719,11 +860,14 @@ if q>=33 and q<=126:
 
 
 
-
-
-
-
-
+SVAKIH30=0
+vremep=time.time()
+myfontwin = pygame.font.SysFont('s', int(HEIGHT/9))
+text_surfacewin = myfontwin.render(f"You win!", True, (255,255,255))
+widthwin=text_surfacewin.get_width()
+heightwin=text_surfacewin.get_height()
+def win():
+    window.blit(text_surfacewin,(WIDTH/2-widthwin/2,HEIGHT/9))
 
 
 
@@ -732,8 +876,8 @@ if q>=33 and q<=126:
 buttonscrolltimes=1
 buttonscrollloc=0
 def button_scroll():
-    window.blit(imgs,(WIDTH/2-width/2,lb[6].y+lb[6].height))
-    window.blit(text_surface,(WIDTH/2-width1/2,lb[6].y+lb[6].height+height/2-height1/2))
+    window.blit(imgs,(x,y))
+    window.blit(text_surface,(x1,y1))
     #WIDTH/2,HEIGHT/6*5.5
 
 img=pygame.image.load("buttons.png")
@@ -744,6 +888,8 @@ width1=text_surface.get_width()
 height1=text_surface.get_height()
 imgs=pygame.transform.scale(img,(width,height))
 qqqqqqqq=1
+x,y=WIDTH/2-width/2,lb[6].y+lb[6].height
+x1,y1=WIDTH/2-width1/2,lb[6].y+lb[6].height+height/2-height1/2
 
 
 
@@ -751,10 +897,7 @@ qqqqqqqq=1
 
 
 
-
-
-
-
+whenwin=0
 
 
 
@@ -807,12 +950,15 @@ prom(5)
 prom(6)
 prom(7)
 prom(8)
+e2=int(14780/WIDTH)
 qq=1
 ukupnom=info["minerala"]
 minerala = 0
 prozor=0
 washolding=False
+vremepre=time.time()
 while True:
+    vremep=time.time()
     if prozor==-1:
         if qq==1:
             qq=0
@@ -828,7 +974,7 @@ while True:
             txtsw1=txts1.get_width()
         
         window.fill("Black")
-        e = random.randint(1,int(14780/WIDTH))
+        e = random.randint(1,e2)
         if e == 1:
             e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
             l_b.append(Background(e))
@@ -887,7 +1033,7 @@ while True:
         if keys[pygame.K_ESCAPE]:
             prozor=0
             washolding=True
-        e = random.randint(1,int(14780/WIDTH))
+        e = random.randint(1,e2)
         if e == 1:
             e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
             l_b.append(Background(e))
@@ -926,7 +1072,7 @@ while True:
         if keys[pygame.K_ESCAPE]:
             prozor=0
             washolding=True
-        e = random.randint(1,int(14780/WIDTH))
+        e = random.randint(1,e2)
         if e == 1:
             e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
             l_b.append(Background(e))
@@ -949,7 +1095,7 @@ while True:
             buttonscrollloc=0
         if buttonscrollloc<0:
             prozor=3+buttonscrolltimes
-        
+
         #GO UP CODE IS BELOW ||||||||||||||||||||||||||||||||||||||
         #GO UP CODE IS BELOW ||||||||||||||||||||||||||||||||||||||
         #GO UP CODE IS BELOW ||||||||||||||||||||||||||||||||||||||
@@ -998,29 +1144,32 @@ while True:
         if keys[pygame.K_ESCAPE]:
             prozor=0
             washolding=True
-        e = random.randint(1,int(14780/WIDTH))
+        e = random.randint(1,e2)
         if e == 1:
             e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
             l_b.append(Background(e))
         window.fill("Black")
         for i in range(len(l_b)):
             l_b[i].move_and_draw(window)
+            
         for i in range(len(lb)):
             if lb[i].prozor==3:
                 lb[i].draw(window)
+            
         button_scroll()
         if button_colision(width,height,WIDTH/2-width/2,lb[6].y+lb[6].height,mousePos,mouseState):
             if button_scrollhold==False:
                 prozor+=1
                 buttonscrollloc+=1
                 button_scrollhold=True
+                if buttonscrollloc>buttonscrolltimes:
+                    prozor=3
+                    buttonscrollloc=0
+                if buttonscrollloc<0:
+                    prozor=3+buttonscrolltimes
         else:
-            button_scrollhold=False
-        if buttonscrollloc>buttonscrolltimes:
-            prozor=3
-            buttonscrollloc=0
-        if buttonscrollloc<0:
-            prozor=3+buttonscrolltimes
+            if button_scrollhold==True:
+                button_scrollhold=False
     #SHOOT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||||
     #SHOOT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||||
     #SHOOT CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||||
@@ -1083,7 +1232,7 @@ while True:
                 prom(6)
     
 
-    
+        
     #MAIN MENU CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
     #MAIN MENU CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
     #MAIN MENU CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
@@ -1099,22 +1248,25 @@ while True:
             if event.type == pygame.QUIT:
                 write(info)
                 ens(info)
+                print(najvecivreme)
+                print(30/najvecivreme)
                 exit()
         if keys[pygame.K_ESCAPE]:
             if washolding==False:
                 write(info)
                 ens(info)
+                print(najvecivreme)
+                print(30/najvecivreme)
                 exit()
         else:
             washolding=False
-        e = random.randint(1,int(14780/WIDTH))
+        e = random.randint(1,e2)
         if e == 1:
             e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
             l_b.append(Background(e))
         window.fill("Black")
-        #part.draw(window)
-        #part.update()
-        
+        part.draw(window)
+        part.update()
         for i in range(len(l_b)):
             l_b[i].move_and_draw(window)
         for i in range(len(lb)):
@@ -1164,12 +1316,12 @@ while True:
         
         
         
-        
-        a_r = random.randint(1,int(14780/WIDTH))
+        if boss.health>0:
+            a_r = random.randint(1,int(14800/WIDTH))
         if a_r == 1:
-            ast = Asteroid(random.randint(0,WIDTH-int(HEIGHT/16.6304347826087)),-int((HEIGHT/16.6304347826087)+10))
+            ast = Asteroid(random.randint(0,WIDTH-int(HEIGHT/16.6304347826087)),-int((HEIGHT/16.6304347826087)+10),info['asteroid health'])
             l_a.append(ast)
-        e = random.randint(1,int(14780/WIDTH))
+        e = random.randint(1,e2)
         if e == 1:
             e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
             l_b.append(Background(e))
@@ -1214,37 +1366,37 @@ while True:
                 del l_lr[q]
                 q-=1
             q+=1
-            
-        if keydict["shot"]:
-            if p1.time_missle<=0:
-                l_missle.append(Missle(p1.x+p1.width/2))
-                p1.time_missle=info["fire rate missle"]
-            if p1.time <= 0:
-                l1 = Laser(p1.x+p1.width/2,info["damage"])
-                if p1.power_db>0:
-                    l2=Laser(p1.x+p1.width/2,info["damage"],1)
-                    l_l.append(l2)
-                p1.time = info["fire rate"]
-                l_l.append(l1)
-                if p1.power_rb>0:
-                    if p1.power_db==0:
-                        if p1.str=="r" or p1.str=="" or p1.str=="c":
-                            l1r=Rotated_Laser(p1.x-p1.width/12.9,p1.y-(p1.height/11.9)*2,45,info["damage"])
-                            l_lr.append(l1r)
-                        if p1.str=="l" or p1.str=="" or p1.str=="c":
-                            l1r=Rotated_Laser(p1.x+(p1.width/12.9)*9,p1.y-(p1.height/11.9)*2,315,info["damage"])
-                            l_lr.append(l1r)
-                    else:
-                        if p1.str=="r" or p1.str=="" or p1.str=="c":
-                            l1r=Rotated_Laser(p1.x-p1.width/12.9,(p1.y-(p1.height/11.9)*2)        ,45,info["damage"],1)
-                            l_lr.append(l1r)
-                            l1r=Rotated_Laser(p1.x-p1.width/12.9,(p1.y-(p1.height/11.9)*2)        ,45,info["damage"],2)
-                            l_lr.append(l1r)
-                        if p1.str=="l" or p1.str=="" or p1.str=="c":
-                            l1r=Rotated_Laser(p1.x+(p1.width/12.9)*9,(p1.y-(p1.height/11.9)*2)       ,315,info["damage"],1)
-                            l_lr.append(l1r)
-                            l1r=Rotated_Laser(p1.x+(p1.width/12.9)*9,(p1.y-(p1.height/11.9)*2)       ,315,info["damage"],2)
-                            l_lr.append(l1r)
+        if boss.health>0 or len(l_a)>0:
+            if keydict["shot"]:
+                if p1.time_missle<=0:
+                    l_missle.append(Missle(p1.x+p1.width/2))
+                    p1.time_missle=info["fire rate missle"]
+                if p1.time <= 0:
+                    l1 = Laser(p1.x+p1.width/2,info["damage"])
+                    if p1.power_db>0:
+                        l2=Laser(p1.x+p1.width/2,info["damage"],1)
+                        l_l.append(l2)
+                    p1.time = info["fire rate"]
+                    l_l.append(l1)
+                    if p1.power_rb>0:
+                        if p1.power_db==0:
+                            if p1.str=="r" or p1.str=="" or p1.str=="c":
+                                l1r=Rotated_Laser(p1.x-p1.width/12.9,p1.y-(p1.height/11.9)*2,45,info["damage"])
+                                l_lr.append(l1r)
+                            if p1.str=="l" or p1.str=="" or p1.str=="c":
+                                l1r=Rotated_Laser(p1.x+(p1.width/12.9)*9,p1.y-(p1.height/11.9)*2,315,info["damage"])
+                                l_lr.append(l1r)
+                        else:
+                            if p1.str=="r" or p1.str=="" or p1.str=="c":
+                                l1r=Rotated_Laser(p1.x-p1.width/12.9,(p1.y-(p1.height/11.9)*2)        ,45,info["damage"],1)
+                                l_lr.append(l1r)
+                                l1r=Rotated_Laser(p1.x-p1.width/12.9,(p1.y-(p1.height/11.9)*2)        ,45,info["damage"],2)
+                                l_lr.append(l1r)
+                            if p1.str=="l" or p1.str=="" or p1.str=="c":
+                                l1r=Rotated_Laser(p1.x+(p1.width/12.9)*9,(p1.y-(p1.height/11.9)*2)       ,315,info["damage"],1)
+                                l_lr.append(l1r)
+                                l1r=Rotated_Laser(p1.x+(p1.width/12.9)*9,(p1.y-(p1.height/11.9)*2)       ,315,info["damage"],2)
+                                l_lr.append(l1r)
 
         for i in range(len(l_l)):
             if l_l[i].health != 0:
@@ -1281,49 +1433,50 @@ while True:
             
         err = 0
         for i in range(len(l_a)):
-            if p1.health!=1:
-                if colision1(pygame.Rect(p1.x+30,p1.y,p1.width-60,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
-                    if p1.health==2:
-                        if colision1(pygame.Rect(p1.x+30,p1.y,23,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
-                            p1.str="l"
-                        elif colision1(pygame.Rect(p1.x+53,p1.y,23,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
-                            p1.str="c"
-                        else:
-                            p1.str="r"
-                    
-                    p1.health-=1
-                    l_a[err].alive=False
-                    l_a[err].drop=False
-            else:
-                if p1.str=="l":
-                    if colision1(pygame.Rect(p1.x,p1.y,p1.width-30,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+            if l_a[err].x>=p1.x-l_a[err].width and l_a[err].x<=p1.x+p1.width and l_a[err].y>=p1.y-l_a[err].height and l_a[err].y<=p1.y+p1.height:
+                if p1.health!=1:
+                    if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width-p1.height/2.15,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                        if p1.health==2:
+                            if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.height/5.608695652173913,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                                p1.str="l"
+                            elif collision1(pygame.Rect(p1.x+p1.height/2.433962264150943,p1.y,p1.height/5.608695652173913,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                                p1.str="c"
+                            else:
+                                p1.str="r"
+                        
                         p1.health-=1
-                        l_a[err].alive=False
-                        l_a[err].drop=False
-                elif p1.str=="r":
-                    if colision1(pygame.Rect(p1.x+30,p1.y,p1.width,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
-                        p1.health-=1
-                        l_a[err].alive=False
+                        l_a[err].alive=0
                         l_a[err].drop=False
                 else:
-                    if colision1(pygame.Rect(p1.x,p1.y,p1.width,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
-                        p1.health-=1
-                        l_a[err].alive=False
-                        l_a[err].drop=False
+                    if p1.str=="l":
+                        if collision1(pygame.Rect(p1.x,p1.y,p1.width-p1.height/4.3,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                            p1.health-=1 
+                            l_a[err].alive=0
+                            l_a[err].drop=False
+                    elif p1.str=="r":
+                        if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                            p1.health-=1
+                            l_a[err].alive=0
+                            l_a[err].drop=False
+                    else:
+                        if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width-p1.height/2.15,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                            p1.health-=1
+                            l_a[err].alive=0
+                            l_a[err].drop=False
             err +=1
         for i in range(len(l_l)):
             for j in range(len(l_a)):
                 
-                if colision1(pygame.Rect(l_l[i].x,l_l[i].y,l_l[i].width,l_l[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):         
-                    if l_a[j].alive == True:
+                if collision1(pygame.Rect(l_l[i].x,l_l[i].y,l_l[i].width,l_l[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):         
+                    if l_a[j].alive >= 0:
                         l_l[i].health-=1
-                        l_a[j].alive = False
+                        l_a[j].alive-=info['damage']
         for i in range(len(l_lr)):
             for j in range(len(l_a)):
-                if colision1(pygame.Rect(l_lr[i].x,l_lr[i].y,l_lr[i].width,l_lr[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):
-                    if l_a[j].alive == True:
+                if collision1(pygame.Rect(l_lr[i].x,l_lr[i].y,l_lr[i].width,l_lr[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):
+                    if l_a[j].alive >= 0:
                         l_lr[i].health-=1
-                        l_a[j].alive = False
+                        l_a[j].alive-=info['damage']
         
         
         
@@ -1331,8 +1484,8 @@ while True:
         
         for i in range(len(l_missle)):
             for j in range(len(l_a)):
-                if colision1(pygame.Rect(l_missle[i].x,l_missle[i].y,l_missle[i].width,l_missle[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):
-                    l_a[j].alive=False     
+                if collision1(pygame.Rect(l_missle[i].x,l_missle[i].y,l_missle[i].width,l_missle[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):
+                    l_a[j].alive=0
                     l_missle[i].alive=False
         err=0
         for i in range(len(l_missle)):
@@ -1355,7 +1508,7 @@ while True:
         
         err = 0
         for i in range(len(l_a)):
-            if l_a[err].alive == False:
+            if l_a[err].alive <= 0:
                 if l_a[err].drop==True:
                     prob_powerup= random.randint(1,15)
                     if prob_powerup==1:
@@ -1365,12 +1518,12 @@ while True:
                         p=Power_up_db(l_a[err].x,l_a[err].y)
                         l_pdb.append(p)
                     else:
-                        m = Mineral(l_a[err].x,l_a[err].y,2.5)
+                        m = Mineral(l_a[err].x,l_a[err].y,HEIGHT/306)
                         l_m.append(m)
                 for i in range(5):
                     timeSpread = i*5
-                    scaleSpread = 1.8-(i/10)*2
-                    e = Explosion(random.randint(l_a[err].x-30,l_a[err].x+l_a[err].width-10),random.randint(l_a[err].y-30,l_a[err].y+l_a[err].height-10),l_a[err].width,l_a[err].height,timeSpread,scaleSpread)
+                    scaleSpread = HEIGHT/425-(i/10)*2
+                    e = Explosion(random.randint(int(l_a[err].x-HEIGHT/30),int(l_a[err].x+l_a[err].width-HEIGHT/90)),random.randint(int(l_a[err].y-HEIGHT/30),int(l_a[err].y+l_a[err].height-HEIGHT/90)),l_a[err].width,l_a[err].height,timeSpread,scaleSpread)
                     l_e.append(e)
                 del l_a[err]
                 err-=1
@@ -1394,7 +1547,7 @@ while True:
                 err-=1
             err+=1
         for i in range(len(l_m)):
-            if colision1(pygame.Rect(l_m[i].x,l_m[i].y,l_m[i].width,l_m[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
+            if collision1(pygame.Rect(l_m[i].x,l_m[i].y,l_m[i].width,l_m[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
                 minerala +=1
                 l_m[i].alive = False
                 
@@ -1429,7 +1582,7 @@ while True:
         i=0
         for j in range(len(l_pdb)):
             l_pdb[i].move_and_draw(window)
-            if colision1(pygame.Rect(l_pdb[i].x,l_pdb[i].y,l_pdb[i].width,l_pdb[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
+            if collision1(pygame.Rect(l_pdb[i].x,l_pdb[i].y,l_pdb[i].width,l_pdb[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
                 del l_pdb[i]
                 p1.power_db=300
                 i-=1
@@ -1448,10 +1601,102 @@ while True:
         i=0
         for j in range(len(l_prb)):
             l_prb[i].move_and_draw(window)
-            if colision1(pygame.Rect(l_prb[i].x,l_prb[i].y,l_prb[i].width,l_prb[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
+            if collision1(pygame.Rect(l_prb[i].x,l_prb[i].y,l_prb[i].width,l_prb[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
                 del l_prb[i]
                 p1.power_rb=300
                 i-=1
             i+=1
+        if boss.health>0:
+            boss.general(window)
+        
+        err=0
+        for i in range(len(l_f)):
+            if l_f[err].health>0:
+                l_f[err].general(window)
+                if p1.health!=1:
+                    if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width-p1.height/2.15,p1.height),pygame.Rect(l_f[err].x,l_f[err].y,l_f[err].width,l_f[err].height)):
+                        if p1.health==2:
+                            if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.height/5.608695652173913,p1.height),pygame.Rect(l_f[err].x,l_f[err].y,l_f[err].width,l_f[err].height)):
+                                p1.str="l"
+                            elif collision1(pygame.Rect(p1.x+p1.height/2.433962264150943,p1.y,p1.height/5.608695652173913,p1.height),pygame.Rect(l_f[err].x,l_f[err].y,l_f[err].width,l_f[err].height)):
+                                p1.str="c"
+                            else:
+                                p1.str="r"
+                        
+                        p1.health-=1
+                        l_f[err].health=0
+                else:
+                    if p1.str=="l":
+                        if collision1(pygame.Rect(p1.x,p1.y,p1.width-p1.height/4.3,p1.height),pygame.Rect(l_f[err].x,l_f[err].y,l_f[err].width,l_f[err].height)):
+                            p1.health-=1 
+                            l_f[err].health=0
+                    elif p1.str=="r":
+                        if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width,p1.height),pygame.Rect(l_f[err].x,l_f[err].y,l_f[err].width,l_f[err].height)):
+                            p1.health-=1
+                            l_f[err].health=0
+                    else:
+                        if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width-p1.height/2.15,p1.height),pygame.Rect(l_f[err].x,l_f[err].y,l_f[err].width,l_f[err].height)):
+                            p1.health-=1
+                            l_f[err].health=0
+            else:
+                del l_f[err]
+                err-=1
+            err+=1
+        if boss.health>=0:
+            for i in range(len(l_lr)):
+                if collision1(pygame.Rect(boss.x,boss.y,boss.width,boss.height),pygame.Rect(l_lr[i].x,l_lr[i].y,l_lr[i].width,l_lr[i].height)):
+                    boss.health-=info["damage"]
+                    l_lr[i].health-=1
+                    if boss.health<=0:
+                        a_r=2
+                        for j in range(1,4):
+                            for i in range(5):
+                                timeSpread = (i*5)*j
+                                scaleSpread = HEIGHT/425-(i/10)*2
+                                e = Explosion(random.randint(int(boss.x-HEIGHT/30),int(boss.x+boss.width-HEIGHT/90)),random.randint(int(boss.y-HEIGHT/30),int(boss.y+boss.height-HEIGHT/90)),int(HEIGHT/16.6304347826087),int(HEIGHT/16.6304347826087),timeSpread,scaleSpread)
+                                l_e.append(e)
+                        gm=Green_Mineral(boss.x+boss.width/2,boss.y,HEIGHT/306)
+                        break
+        if boss.health>=0:
+            for i in range(len(l_l)):
+                if collision1(pygame.Rect(boss.x,boss.y,boss.width,boss.height),pygame.Rect(l_l[i].x,l_l[i].y,l_l[i].width,l_l[i].height)):
+                    boss.health-=info["damage"]
+                    l_l[i].health-=1
+                    if boss.health<=0:
+                        a_r=2
+                        for j in range(1,4):
+                            for i in range(5):
+                                timeSpread = (i*5)*j
+                                scaleSpread = HEIGHT/425-(i/10)*2
+                                e = Explosion(random.randint(int(boss.x-HEIGHT/30),int(boss.x+boss.width-HEIGHT/90)),random.randint(int(boss.y-HEIGHT/30),int(boss.y+boss.height-HEIGHT/90)),int(HEIGHT/16.6304347826087),int(HEIGHT/16.6304347826087),timeSpread,scaleSpread)
+                                l_e.append(e)
+                        gm=Green_Mineral(boss.x+boss.width/2,boss.y,HEIGHT/306)
+                        break
+        if boss.health<1:
+            if gm.alive==True:
+                if collision1(pygame.Rect(p1.x,p1.y,p1.width,p1.height),pygame.Rect(gm.x,gm.y,gm.width,gm.height)):
+                    minerala+=50
+                    gm.alive=False
+                    whenwin=300
+            
+        
+        
+        
+            gm.move_and_draw(window)
+        if whenwin>0:
+            whenwin-=1
+            if whenwin==0:
+                prozor=0
+                l_a,l_l,prozor,l_e,l_m=mainmenu()
+            win()
+        
+        
     pygame.display.update()
     clock.tick(60)
+    SVAKIH30+=1
+    if SVAKIH30==30:
+        SVAKIH30=0
+        if time.time()-vremepre>najvecivreme:
+            najvecivreme=time.time()-vremepre
+        print(time.time()-vremepre)
+        vremepre=time.time()
