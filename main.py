@@ -234,7 +234,7 @@ class Particle:
         s.distance=0
         s.radius=HEIGHT/(16.6304347826087*5)
         s.color = (random.randint(118, 138), random.randint(0, 20), random.randint(118, 138))
-        s.alpha = random.randint(50, 100)
+        s.alpha = random.randint(70, 150)
     def draw(self, screen):
         particle_surface = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA) #Create transparent surface.
         pygame.draw.circle(particle_surface, self.color + (self.alpha,), (self.radius, self.radius), self.radius) #draw circle with alpha.
