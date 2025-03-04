@@ -36,7 +36,10 @@ def Vector_Normalization(x1, y1, x2, y2):
     distancex*=HEIGHT/150
     distancey*=HEIGHT/150                                                                                                                                                                        
     return distancex,distancey
-
+def get_angle(dx,dy):
+    angle_rad = math.atan2(-dy, dx)
+    angle_deg = math.degrees(angle_rad)
+    return angle_deg
     
     
     
@@ -55,7 +58,7 @@ def collison(x1,y1,r1,x2,y2,r2):
         return False
     else:
         return True
-def collision1(rect1 : pygame.Rect,rect2):
+def collision1(rect1 : pygame.Rect,rect2 : pygame.Rect):
     if rect1.colliderect(rect2):
         return True
     return False
@@ -83,6 +86,7 @@ keydict={
 }
 clock = pygame.time.Clock()
 WIDTH,HEIGHT = 1540,900
+WIDTH,HEIGHT = 800,800
 window = pygame.display.set_mode((WIDTH,HEIGHT))
 def highlight(width,height,x,y,mousePos):
     if mousePos[0] > x and mousePos[0] < x + width and mousePos[1] > y and mousePos[1] < y + height:
@@ -223,7 +227,7 @@ class Player:
             s.power_db-=1
 
 class Particle:
-    def __init__(s,x,y,lifetime,dx,dy):
+    def __init__(s,x,y,lifetime,dx,dy,radius,color,alpha,prozor,delay):
         s.x=x
         s.y=y
         s.lifetime=lifetime
@@ -232,9 +236,11 @@ class Particle:
         s.distancex=0
         s.distancey=0
         s.distance=0
-        s.radius=HEIGHT/(16.6304347826087*5)
-        s.color = (random.randint(118, 138), random.randint(0, 20), random.randint(118, 138))
-        s.alpha = random.randint(70, 150)
+        s.prozor=prozor
+        s.radius=radius
+        s.color = color
+        s.alpha = alpha
+        s.delay=delay
     def draw(self, screen):
         particle_surface = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA) #Create transparent surface.
         pygame.draw.circle(particle_surface, self.color + (self.alpha,), (self.radius, self.radius), self.radius) #draw circle with alpha.
@@ -249,19 +255,14 @@ class Particle_System:
         s.attractor=0
     def draw(s,window):
         for i in range(len(s.l_p)):
-            s.l_p[i].draw(window)
+            if s.l_p[i].prozor==prozor:
+                if s.l_p[i].delay==0:
+                    s.l_p[i].draw(window)
+                else:
+                    s.l_p[i].delay-=1
     
     
     def update(s):
-        # Spawn new particles if needed
-        probpart=random.randint(1,3)
-        if probpart==1:
-            w=random.randint(1,3)
-            qqq=random.randint(1,2)
-            if qqq==1:
-                w*=-1
-            s.l_p.append(Particle(WIDTH/2+WIDTH/2.566666666666667,HEIGHT/2-WIDTH/5.133333333333333,250,w,-10))
-        
         
         count=0
         for i in range(len(s.l_p)):
@@ -274,27 +275,38 @@ class Particle_System:
         for i in range(len(l_attractors)):
             if l_attractors[i].prozor==prozor:
                 for j in range(len(s.l_p)):
-                    s.l_p[j].distancex=l_attractors[i].x-s.l_p[j].x
-                    s.l_p[j].distancey=l_attractors[i].y-s.l_p[j].y
-                    s.l_p[j].distance=math.sqrt(s.l_p[j].distancex*s.l_p[j].distancex+s.l_p[j].distancey*s.l_p[j].distancey)
-                    s.l_p[j].dx+=(s.l_p[j].distancex*(HEIGHT/1092857.142857143))
-                    s.l_p[j].dy+=(s.l_p[j].distancey*(HEIGHT/1092857.142857143))
+                    if s.l_p[j].prozor==prozor:
+                        if s.l_p[j].delay==0:
+                            s.l_p[j].distancex=l_attractors[i].x-s.l_p[j].x
+                            s.l_p[j].distancey=l_attractors[i].y-s.l_p[j].y
+                            s.l_p[j].distance=math.sqrt(s.l_p[j].distancex*s.l_p[j].distancex+s.l_p[j].distancey*s.l_p[j].distancey)
+                            s.l_p[j].dx+=(s.l_p[j].distancex*(HEIGHT/1092857.142857143))
+                            s.l_p[j].dy+=(s.l_p[j].distancey*(HEIGHT/1092857.142857143))
                 #l_attractors[i].draw(window)
+                """
                 if s.attractor==0:
-                    """
                     for ii in range(len(l_attractors)):
                         l_attractors[ii].x=random.randint(0,WIDTH)
                         l_attractors[ii].y=random.randint(0,HEIGHT)
-                    """
                     s.attractor=240
+                """
         for i in range(len(s.l_p)):
             if s.l_p[i].lifetime>=1:
-                s.l_p[i].dy+=s.gravity
-                s.l_p[i].x+=s.l_p[i].dx
-                s.l_p[i].y+=s.l_p[i].dy
-                
-                s.l_p[i].lifetime-=1
-        s.attractor-=1
+                if s.l_p[i].prozor==prozor:
+                    if s.l_p[i].delay==0:
+                        s.l_p[i].dy+=s.gravity
+                        s.l_p[i].x+=s.l_p[i].dx
+                        s.l_p[i].y+=s.l_p[i].dy
+                        
+                        s.l_p[i].lifetime-=1
+        #s.attractor-=1
+    def spawn(s,maxdx,x,y,liftime,dy,rad,color,alpha,prozor,delay):
+        w=random.uniform(0.1,maxdx)
+        qqq=random.randint(1,2)
+        if qqq==1:
+            w*=-1
+        s.l_p.append(Particle(x,y,liftime,w,dy,rad,color,alpha,prozor,delay))
+        
 
 
 class Attractor:
@@ -335,22 +347,21 @@ class Missle:
     def __init__(s,x):
         s.x=x
         s.y=p1.y
-        s.angle=0
-        s.img = pygame.image.load("particle.png")
-        s.width = 336*0.075
-        s.height = 801*0.075
+        s.angle=90
+        s.img = pygame.image.load("missle.png")
         s.minbrzina=-3
-        s.maxbrzina=4
+        s.maxbrzina=3
         s.index=-1
         s.dx=0
-        s.dy=-2
-        s.ddx=0
-        s.ddy=0
+        s.dy=-3
+        s.dangle=3
+        s.desired_angle=0
         s.alive=True
-        s.width = HEIGHT/25.5
-        s.height = HEIGHT/25.5
-        s.q=0.0075
-        mindistince=1000000
+        s.scale=0.075
+        s.speed=HEIGHT/150
+        s.width = s.img.get_width()*s.scale
+        s.height = s.img.get_height()*s.scale
+        mindistince=max(HEIGHT,WIDTH)*3
         s.y-=s.height
         for i in range(len(l_a)):
             if l_a[i].alive==True:
@@ -361,28 +372,45 @@ class Missle:
                     mindistince=distince
                     s.index=i
         s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))
+        s.rotated_img=pygame.transform.rotate(s.scaled_img,s.angle)
     def draw(s,window):
-        rotated_img=pygame.transform.rotate(s.scaled_img,s.angle)
-        s.width=rotated_img.get_width()
-        s.height=rotated_img.get_height()
-        window.blit(rotated_img,(s.x,s.y))
+        s.rotated_img = pygame.transform.rotate(s.scaled_img, -s.angle+90)  # Pygame rotates counterclockwise by default
+        s.width=s.rotated_img.get_width()
+        s.height=s.rotated_img.get_height()
+        window.blit(s.rotated_img,(s.x-s.width/2,s.y-s.height/2))
     def move(s):
         if s.index>=0 and s.index <len(l_a):
-            if l_a[s.index].x<s.x:
-                s.ddx-=s.q
-            elif l_a[s.index].x!=s.x:
-                s.ddx+=s.q
-            if l_a[s.index].y<s.y:
-                s.ddy-=s.q
-            elif l_a[s.index].y!=s.y:
-                s.ddy+=s.q
-        s.dx+=s.ddx
-        s.dy+=s.ddy
+            s.dx,s.dy=Vector_Normalization(s.x,s.y,l_a[s.index].x+l_a[s.index].width/2,l_a[s.index].y+l_a[s.index].height/2)
+        else:
+            s.change()
+        s.desired_angle=get_angle(s.dx,s.dy)
+        if s.angle<s.desired_angle:
+            if s.angle+s.dangle<=s.desired_angle:
+                s.angle+=s.dangle
+            else:
+                s.angle=s.desired_angle
+        
+        if s.angle>s.desired_angle:
+            if s.angle-s.dangle>=s.desired_angle:
+                s.angle-=s.dangle
+            else:
+                s.angle=s.desired_angle
+        if s.angle>360:
+            s.angle-=360
+        if s.angle<0:
+            s.angle+=360
+        s.dx=math.cos(math.radians(s.angle))
+        s.dy=math.sin(math.radians(s.angle))
+        s.dx*=s.speed
+        s.dy*=s.speed
+        s.dy*=-1
         s.x+=s.dx
         s.y+=s.dy
-        if s.x+s.width<0 or s.x>WIDTH or s.y+s.height<0 or s.y>HEIGHT:
+        if s.x+s.width/2<0 or s.x-s.width/2>WIDTH or s.y+s.height/2<0 or s.y+s.height/2>HEIGHT:
             s.alive=False
-            
+        pygame.draw.line(window,(255,0,0),(s.x,s.y),(s.x+(s.dx*100),s.y+(s.dy*100)))
+        if s.index>=0 and s.index <len(l_a):
+            pygame.draw.circle(window,(0,255,0),(l_a[s.index].x+l_a[s.index].width/2,l_a[s.index].y+l_a[s.index].height/2),l_a[s.index].width)
     def change(s):
         s.index=-1
         mindistince=1000000
@@ -467,6 +495,21 @@ class Asteroid:
             s.y+=s.speed
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 l_a = []
 l_e = []
 class Explosion:
@@ -480,16 +523,17 @@ class Explosion:
         s.t = time
         s.Time_from_death = 0
         s.ss = ss
+        
+        s.images={}
+        for i in range(7):
+            s.img = pygame.image.load(f"explosion{i}.png")
+            s.width1=s.w*s.ss
+            s.height1=s.h*s.ss
+            s.scaled_img1 = pygame.transform.scale(s.img, (s.width1, s.height1))
+            s.images[i]=s.scaled_img1
     def draw(s,window):
-        s.width1 = s.h
-        s.height1 = s.h
-        # Filip big-brain implementation
-        s.img = pygame.image.load(f"explosion{s.Time_from_death//5}.png")
-        s.width1*=s.ss
-        s.height1*=s.ss
-        s.scaled_img1 = pygame.transform.scale(s.img, (s.width1, s.height1))
         if s.t==0:
-            window.blit(s.scaled_img1,(s.x,s.y))
+            window.blit(s.images[s.Time_from_death//5],(s.x,s.y))
         if s.t == 0:
             s.Time_from_death+=1
         else:
@@ -698,6 +742,7 @@ def mainmenu():
     ukupnom+=minerala
     minerala=0
     prozor=0
+    part.l_p=[]
     return l_a,l_l,prozor,l_e,l_m
 
 def change(index1,index2,index1c,index2c):
@@ -950,6 +995,18 @@ prom(5)
 prom(6)
 prom(7)
 prom(8)
+
+
+
+godmode=True
+
+
+
+
+
+
+
+
 e2=int(14780/WIDTH)
 qq=1
 ukupnom=info["minerala"]
@@ -1265,6 +1322,9 @@ while True:
             e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
             l_b.append(Background(e))
         window.fill("Black")
+        # Spawn new particles if needed
+        if random.randint(1,int(HEIGHT/300))==1:
+            part.spawn(3,WIDTH/2+WIDTH/2.566666666666667,HEIGHT/2-WIDTH/5.133333333333333,250,-10,HEIGHT/(16.6304347826087*5),(random.randint(118, 138), random.randint(0, 20), random.randint(118, 138)),random.randint(70, 150),0,0)
         part.draw(window)
         part.update()
         for i in range(len(l_b)):
@@ -1317,7 +1377,7 @@ while True:
         
         
         if boss.health>0:
-            a_r = random.randint(1,int(14800/WIDTH))
+            a_r = random.randint(1,int((14800*2)/WIDTH))
         if a_r == 1:
             ast = Asteroid(random.randint(0,WIDTH-int(HEIGHT/16.6304347826087)),-int((HEIGHT/16.6304347826087)+10),info['asteroid health'])
             l_a.append(ast)
@@ -1326,6 +1386,8 @@ while True:
             e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
             l_b.append(Background(e))
         window.fill("Black")
+        part.draw(window)
+        part.update()
         for i in range(len(l_b)):
             l_b[i].move_and_draw(window)
         events = pygame.event.get()
@@ -1371,7 +1433,7 @@ while True:
                 if p1.time_missle<=0:
                     l_missle.append(Missle(p1.x+p1.width/2))
                     p1.time_missle=info["fire rate missle"]
-                if p1.time <= 0:
+                if p1.time <= 0 and False:
                     l1 = Laser(p1.x+p1.width/2,info["damage"])
                     if p1.power_db>0:
                         l2=Laser(p1.x+p1.width/2,info["damage"],1)
@@ -1443,24 +1505,27 @@ while True:
                                 p1.str="c"
                             else:
                                 p1.str="r"
-                        
-                        p1.health-=1
+                        if godmode:
+                            p1.health-=1
                         l_a[err].alive=0
                         l_a[err].drop=False
                 else:
                     if p1.str=="l":
                         if collision1(pygame.Rect(p1.x,p1.y,p1.width-p1.height/4.3,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
-                            p1.health-=1 
+                            if godmode:
+                                p1.health-=1 
                             l_a[err].alive=0
                             l_a[err].drop=False
                     elif p1.str=="r":
                         if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
-                            p1.health-=1
+                            if godmode:
+                                p1.health-=1
                             l_a[err].alive=0
                             l_a[err].drop=False
                     else:
                         if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width-p1.height/2.15,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
-                            p1.health-=1
+                            if godmode:
+                                p1.health-=1
                             l_a[err].alive=0
                             l_a[err].drop=False
             err +=1
@@ -1484,7 +1549,7 @@ while True:
         
         for i in range(len(l_missle)):
             for j in range(len(l_a)):
-                if collision1(pygame.Rect(l_missle[i].x,l_missle[i].y,l_missle[i].width,l_missle[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):
+                if collision1(pygame.Rect(l_missle[i].x-l_missle[i].width/2,l_missle[i].y-l_missle[i].height/2,l_missle[i].width,l_missle[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):
                     l_a[j].alive=0
                     l_missle[i].alive=False
         err=0
@@ -1550,6 +1615,8 @@ while True:
             if collision1(pygame.Rect(l_m[i].x,l_m[i].y,l_m[i].width,l_m[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
                 minerala +=1
                 l_m[i].alive = False
+                for ii in range(10):
+                    part.spawn(1,l_m[i].x+l_m[i].width/2,l_m[i].y+l_m[i].height/2,random.randint(20,120),-1,HEIGHT/180,(random.randint(140, 200),0,0),random.randint(70, 150),1,random.randint(0,40))
                 
         err = 0
         for i in range(len(l_m)):
@@ -1607,7 +1674,8 @@ while True:
                 i-=1
             i+=1
         if boss.health>0:
-            boss.general(window)
+            pass
+            #boss.general(window)
         
         err=0
         for i in range(len(l_f)):
