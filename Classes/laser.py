@@ -1,7 +1,7 @@
 import pygame
 pygame.init()
 import math
-from player import *
+from Classes.player import *
 WIDTH,HEIGHT=1540,900
 
 
@@ -16,7 +16,7 @@ class Laser:
         s.ddy=-HEIGHT/15300
         s.dx=0
         s.ddx=0
-        s.img = pygame.image.load('laser.png')
+        s.img = pygame.image.load('textures/laser.png')
         s.width = s.img.get_width()*(HEIGHT/3400)
         s.height = s.img.get_height()*(HEIGHT/3400)
         s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))

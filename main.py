@@ -32,36 +32,6 @@ These are actual variable names...
 """
 
 
-def ens(file_data):
-    f=Fernet(keyE)
-    encrypted_data1=json.dumps(file_data).encode('utf-8')
-    encrypted_data = f.encrypt(encrypted_data1)
-    with open("infojson.json", "wb") as file:
-        file.write(encrypted_data)
-
-
-def end():
-    f=Fernet(keyE)
-    with open("infojson.json", "rb") as file:
-        encrypted_data = file.read()
-    decrypted_data = f.decrypt(encrypted_data)
-    decrypted_data1=json.loads(decrypted_data.decode('utf-8'))
-    return decrypted_data1
-
-def Vector_Normalization(x1, y1, x2, y2):
-    # Calculate dx and dy with direction
-    distancex = x2 - x1
-    distancey = y2 - y1
-    vector_lenght=math.sqrt(distancex*distancex+distancey*distancey)
-    distancex=distancex/vector_lenght
-    distancey=distancey/vector_lenght
-    distancex*=HEIGHT/150 # For speed
-    distancey*=HEIGHT/150 # For speed
-    return distancex,distancey
-def get_angle(dx,dy):
-    angle_rad = math.atan2(dy, dx)
-    angle_deg = math.degrees(angle_rad)
-    return angle_deg
     
     
     
@@ -70,33 +40,6 @@ def get_angle(dx,dy):
 
 
 
-def collison(x1,y1,r1,x2,y2,r2):
-    dx = x2 - x1
-    dy = y2 - y1
-    dist  = dx * dx + dy * dy
-    dist = math.sqrt(dist)
-    
-    if dist >= r1 + r2:
-        return False
-    else:
-        return True
-def collision1(rect1 : pygame.Rect,rect2 : pygame.Rect):
-    if rect1.colliderect(rect2):
-        return True
-    return False
-
-char ="!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
-
-def checker(keys,index):
-    pressed = 0
-    for key in range(512):
-        if keys[key]:
-            pressed = key
-            break
-    if pressed!=0 and pressed!=heal_int and pressed!=shoot_int and pressed!=go_right_int and pressed!=go_left_int and pressed!=go_up_int and pressed!=go_down_int:
-        return pressed
-    else:
-        return index
 
 keydict={
     "shot":keys[pygame.K_SPACE],
@@ -109,37 +52,27 @@ keydict={
 clock = pygame.time.Clock()
 WIDTH,HEIGHT = 1540,900
 window = pygame.display.set_mode((WIDTH,HEIGHT))
-def highlight(width,height,x,y,mousePos):
-    if mousePos[0] > x and mousePos[0] < x + width and mousePos[1] > y and mousePos[1] < y + height:
-        return True
-    else:
-        return False
-
-def button_colision(width,height,x,y,mousePos,mouseState):
-    """Collides the clicking of the would-be button given"""
-    if mousePos[0] > x and mousePos[0] < x + width and mousePos[1] > y and mousePos[1] < y + height and mouseState[0] == True:
-        return True
-    else:
-        return False
 
 
 
 
 
 
-from background import *
-from particle_and_particle_system import *
-from mineral import *
-from green_mineral import *
-from explosion import *
-from asteroid import *
-from fireball import *
-from boss import *
-from button import *
-from laser import *
 
-
-
+from Classes.background import *
+from Classes.player import *
+from Classes.particle_and_particle_system import *
+from Classes.mineral import *
+from Classes.green_mineral import *
+from Classes.explosion import *
+from Classes.asteroid import *
+from Classes.fireball import *
+from Classes.boss import *
+from Classes.button import *
+from Classes.laser import *
+from Classes.powerup import *
+from Classes.functions import *
+from Classes.store import *
 
 
 
@@ -166,7 +99,7 @@ l_attractors=[Attractor(WIDTH/2,HEIGHT/2,0),
 ]
 #l_attractors=[]
 
-part=Particle_System()
+
 
 
 
@@ -307,100 +240,14 @@ l_m = []
 
 l_a = []
 l_e = []
-
-
-#Zeleni
-class Power_up:
-    def __init__(s,x,y,vrsta):
-        s.x=x
-        s.y=y
-        s.speed=HEIGHT/306
-        s.alive=True
-        s.link=vrsta
-        s.image=pygame.image.load(f"powerup{vrsta}.png")
-        s.height = HEIGHT/17
-        s.width = HEIGHT/17
-        s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
-    def move_and_draw(s,window):
-        s.y+=s.speed
-        window.blit(s.scaled_img,(s.x,s.y))
-        if s.y>=HEIGHT:
-            s.alive=False
-
-
-
-
-
-        
-
-
-
-
-
-
-boss = Boss(WIDTH/2,100)
-
-
-
-
 start=50
-def mainmenu():
-    global ukupnom
-    global minerala
-    global l_p
-    global boss
-    boss.health=75
-    boss.shoot=50
-    global l_f
-    l_f=[]
-    global l_missle
-    l_missle=[]
-    global p1
-    p1.power_db=0
-    p1.power_rb=0
-    p1.str=""
-    l_p=[]
-    l_a=[]
-    l_l=[]
-    l_e=[]
-    l_m=[]
-    p1.health=3
-    ukupnom+=minerala
-    minerala=0
-    prozor=0
-    part.l_p=[]
-    return l_a,l_l,prozor,l_e,l_m
-
-def change(index1,index2,index1c,index2c):
-    info[index1]+=index1c
-    info[index2]+=index2c
-def read():
-    info=end()
-    return info
-
-info=read()
-
-def write(info):
-    info["minerala"]=ukupnom
-    info["minerala"]=0
-    info={'minerala': 0, 'username': '', 'kojis': 32, 'kojil': 97, 'kojid': 100, 'kojih': 104, 'fire rate': 13, 'highscore': 546, 'damage': 1, 'fire rate missle': 20, 'kojidole': 115, 'kojig': 119, 'asteroid health': 1,}
-    ens(info)
-
-
 SCALE_MAIN_MENU_BUTTON=273.2142857142857
 SCALE_SETTINGS_BUTTON=127.5
-
 wsmmb=WIDTH/SCALE_MAIN_MENU_BUTTON
 hsmmb=HEIGHT/SCALE_MAIN_MENU_BUTTON
 wssb=WIDTH/SCALE_SETTINGS_BUTTON
 hssb=HEIGHT/SCALE_SETTINGS_BUTTON
-
-
-
-
 myfont1 = pygame.font.SysFont('s', int(HEIGHT/12.75))
-
-
 myfont = pygame.font.SysFont('s', int(HEIGHT/10.92857142857143))
 
 lb=[Button(WIDTH/2,HEIGHT/4,"start","",0,0,wsmmb,hsmmb),
@@ -413,41 +260,10 @@ lb=[Button(WIDTH/2,HEIGHT/4,"start","",0,0,wsmmb,hsmmb),
     Button(WIDTH/2,HEIGHT/6*1,"zapucanje","Change go up key from w",myfont1,4,wssb,hssb),
     Button(WIDTH/2,HEIGHT/6*2,"zapucanje","Change go down key from s",myfont1,4,wssb,hssb)
 ]
-def draw_minerals(x,y,window,minerala):
-    img = pygame.image.load("mineral.png")
-    width = HEIGHT/25.5
-    height = HEIGHT/25.5
-    scaled_img = pygame.transform.scale(img, (width, height))
-    window.blit(scaled_img,(x,y))
-    myfont = pygame.font.SysFont('B', int(HEIGHT/17))
-    text_surface = myfont.render(f"{minerala}", True, (255, 255, 255))
-    window.blit(text_surface,(x+width+WIDTH/76.5,y))
 
 l_p=[]
-def prom(index):
-    lb[index].width1=lb[index].text_surface.get_width()
-    lb[index].height1=lb[index].text_surface.get_height()
 najvecivreme=0
 
-class Store:
-    def __init__(s,x,y,index,text,cost,quantity,op):
-        s.x =x
-        s.y=y
-        s.quantity=quantity
-        s.index=index
-        s.op=op
-        s.cost=cost
-        s.img = pygame.image.load("buttons.png")
-        myfont = pygame.font.SysFont('B', int(WIDTH/17))
-        s.text_surface = myfont.render(f"{text}", True, (255, 255, 255))
-        s.width1=s.text_surface.get_width()
-        s.height1=s.text_surface.get_height()
-        s.width = s.width1+20
-        s.height = s.height1+20
-        s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))
-    def draw(s,window):
-        window.blit(s.scaled_img,(s.x,s.y))
-        window.blit(s.text_surface,(s.x+10,s.y+10))
 
 l_s=[
     Store(WIDTH/7.65,HEIGHT/7.65,"fire rate","Laser exhaust",100,7,-1),
@@ -520,7 +336,7 @@ if q>=33 and q<=126:
     lb[8].text_surface = myfont1.render(f"Change go down key from {char[go_down_int-34]}", True, (15, 15, 15))
 
 
-
+l_f=[]
 
 
 SVAKIH30=0
@@ -542,7 +358,7 @@ def button_scroll():
     window.blit(text_surface,(x1,y1))
     #WIDTH/2,HEIGHT/6*5.5
 
-img=pygame.image.load("buttons.png")
+img=pygame.image.load("textures/buttons.png")
 text_surface = myfont1.render(f"Next page", True, (0,0,0))
 width=lb[3].width
 height=lb[3].height
@@ -604,12 +420,12 @@ if q>=33 and q<=126:
     heal_int=q
     info["kojih"]=q
     lb[6].text_surface = myfont1.render(f"Change heal key from {char[heal_int-34]}", True, (15, 15, 15))
-prom(3)
-prom(4)
-prom(5)
-prom(6)
-prom(7)
-prom(8)
+prom(3,lb)
+prom(4,lb)
+prom(5,lb)
+prom(6,lb)
+prom(7,lb)
+prom(8,lb)
 
 
 
@@ -777,12 +593,12 @@ while True:
                 info["kojig"]=q
                 go_up_int=q
                 lb[7].text_surface = myfont1.render(f"Change go up key from Space", True, (15, 15, 15))
-                prom(7)
+                prom(7,lb)
             if q>=33 and q<=126:
                 info["kojig"]=q
                 go_up_int=q
                 lb[7].text_surface = myfont1.render(f"Change go up key from {char[go_up_int-34]}", True, (15, 15, 15))
-                prom(7)
+                prom(7,lb)
         
         #GO DOWN CODE IS BELOW ||||||||||||||||||||||||||||||||||||
         #GO DOWN CODE IS BELOW ||||||||||||||||||||||||||||||||||||
@@ -792,13 +608,13 @@ while True:
             if q==32:
                 info["kojidole"]=q
                 go_down_int=q
-                lb[8].text_surface = myfont1.render(f"Change go up key from Space", True, (15, 15, 15))
-                prom(8)
+                lb[8].text_surface = myfont1.render(f"Change go down key from Space", True, (15, 15, 15))
+                prom(8,lb)
             if q>=33 and q<=126:
                 info["kojidole"]=q
                 go_down_int=q
-                lb[8].text_surface = myfont1.render(f"Change go up key from {char[go_down_int-34]}", True, (15, 15, 15))
-                prom(8)
+                lb[8].text_surface = myfont1.render(f"Change go down key from {char[go_down_int-34]}", True, (15, 15, 15))
+                prom(8,lb)
 #SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
 #SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
 #SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
@@ -851,12 +667,12 @@ while True:
                 info["kojis"]=q
                 shoot_int=q
                 lb[3].text_surface = myfont1.render(f"Change shoot key from Space", True, (15, 15, 15))
-                prom(3)
+                prom(3,lb)
             if q>=33 and q<=126:
                 info["kojis"]=q
                 shoot_int=q
                 lb[3].text_surface = myfont1.render(f"Change shoot key from {char[shoot_int-34]}", True, (15, 15, 15))
-                prom(3)
+                prom(3,lb)
     #GOING LEFT CODE BELOW |||||||||||||||||||||||||||||||||||||||||
     #GOING LEFT CODE BELOW |||||||||||||||||||||||||||||||||||||||||
     #GOING LEFT CODE BELOW |||||||||||||||||||||||||||||||||||||||||
@@ -866,12 +682,12 @@ while True:
                 go_left_int=q
                 info["kojil"]=q
                 lb[4].text_surface = myfont1.render(f"Change go left key from Space", True, (15, 15, 15))
-                prom(4)
+                prom(4,lb)
             if q>=33 and q<=126:
                 go_left_int=q
                 info["kojil"]=q
                 lb[4].text_surface = myfont1.render(f"Change go left key from {char[go_left_int-34]}", True, (15, 15, 15))
-                prom(4)
+                prom(4,lb)
     #GOING RIGHT CODE BELOW ||||||||||||||||||||||||||||||||||||||||
     #GOING RIGHT CODE BELOW ||||||||||||||||||||||||||||||||||||||||
     #GOING RIGHT CODE BELOW ||||||||||||||||||||||||||||||||||||||||
@@ -881,12 +697,12 @@ while True:
                 go_right_int=q
                 info["kojid"]=q
                 lb[5].text_surface = myfont1.render(f"Change go right key from Space", True, (15, 15, 15))
-                prom(5)
+                prom(5,lb)
             if q>=33 and q<=126:
                 go_right_int=q
                 info["kojid"]=q
                 lb[5].text_surface = myfont1.render(f"Change go right key from {char[go_right_int-34]}", True, (15, 15, 15))
-                prom(5)
+                prom(5,lb)
     #HEALING CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||
     #HEALING CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||
     #HEALING CODE BELOW ||||||||||||||||||||||||||||||||||||||||||||
@@ -896,12 +712,12 @@ while True:
                 heal_int=q
                 info["kojih"]=q
                 lb[6].text_surface = myfont1.render(f"Change heal key from Space", True, (15, 15, 15))
-                prom(6)
+                prom(6,lb)
             if q>=33 and q<=126:
                 heal_int=q
                 info["kojih"]=q
                 lb[6].text_surface = myfont1.render(f"Change heal key from {char[heal_int-34]}", True, (15, 15, 15))
-                prom(6)
+                prom(6,lb)
     
 
         
@@ -1263,7 +1079,8 @@ while True:
             
             
         if boss.health>0:
-            l_f = boss.general(window)
+            boss.general(window,l_f)
+            
         
         err=0
         for i in range(len(l_f)):

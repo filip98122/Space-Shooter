@@ -2,7 +2,7 @@ import pygame
 import random
 pygame.init()
 WIDTH,HEIGHT=1540,900
-from attractor import *
+from Classes.attractor import *
 import math
 class Particle:
     def __init__(s,x,y,lifetime,dx,dy,radius,color,alpha,prozor,delay):
@@ -84,3 +84,4 @@ class Particle_System:
         if if_negative==1:
             w*=-1
         s.l_p.append(Particle(x,y,liftime,w,dy,rad,color,alpha,prozor,delay))
+part=Particle_System()

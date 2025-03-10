@@ -7,7 +7,7 @@ class Attractor:
         s.x=x
         s.y=y
         s.prozor=prozor
-        s.img = pygame.image.load("particle_red.png")
+        s.img = pygame.image.load("textures/particle_red.png")
         s.width = HEIGHT/25.5
         s.height = HEIGHT/25.5
         s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))

@@ -12,17 +12,17 @@ class Background:
         s.d = random.randint(1,5)
         s.speedy=(HEIGHT/765)*s.d
         if s.d == 5:
-            s.image = pygame.image.load('star1.png')
+            s.image = pygame.image.load('textures/star1.png')
             s.width = s.image.get_width()*(HEIGHT/1000)
             s.height = s.image.get_height()*(HEIGHT/1000)
             s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
         if s.d <= 3:
-            s.image = pygame.image.load('star3.png')
+            s.image = pygame.image.load('textures/star3.png')
             s.width = s.image.get_width()*(HEIGHT/1000)
             s.height = s.image.get_height()*(HEIGHT/1000)
             s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))
         if s.d == 4:
-            s.image = pygame.image.load('star2.png')
+            s.image = pygame.image.load('textures/star2.png')
             s.width = s.image.get_width()*(HEIGHT/1000)
             s.height = s.image.get_height()*(HEIGHT/1000)
             s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))

@@ -9,7 +9,7 @@ class Button:
         s.scale1=scale1
         s.prozor = prozor
         s.text=text
-        img1=pygame.image.load(f"{img}.png")
+        img1=pygame.image.load(f"textures/{img}.png")
         s.width=img1.get_width()*s.scale
         s.height=img1.get_height()*s.scale1
         s.scaled_img=pygame.transform.scale(img1,(s.width,s.height))

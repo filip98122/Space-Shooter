@@ -16,30 +16,30 @@ class Player:
         s.time_missle=0
         s.dy=0
         scale=HEIGHT/5940.594059405941
-        img = pygame.image.load('1c.png')
+        img = pygame.image.load('textures/1c.png')
         s.height = img.get_height()*scale
         s.width = s.height
         e=pygame.transform.scale(img, (s.width, s.height))
         
         
-        img = pygame.image.load('2.png')
+        img = pygame.image.load('textures/2.png')
         s.height = img.get_height()*scale
         s.width = s.height
         w=pygame.transform.scale(img, (s.width, s.height))
         
         
         
-        img = pygame.image.load('3.png')
+        img = pygame.image.load('textures/3.png')
         s.height = img.get_height()*scale
         s.width=s.height
         q=pygame.transform.scale(img, (s.width, s.height))
         
-        img = pygame.image.load('1l.png')
+        img = pygame.image.load('textures/1l.png')
         s.height = img.get_height()*scale
         s.width=s.height
         t=pygame.transform.scale(img, (s.width, s.height))
         
-        img = pygame.image.load('1r.png')
+        img = pygame.image.load('textures/1r.png')
         s.height = img.get_height()*scale
         s.width=s.height
         r=pygame.transform.scale(img, (s.width, s.height))

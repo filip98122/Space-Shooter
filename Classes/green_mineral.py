@@ -7,7 +7,7 @@ class Green_Mineral:
         s.y = y
         s.alive = True
         s.dy = dy
-        s.img = pygame.image.load("green mineral.png")
+        s.img = pygame.image.load("textures/green mineral.png")
         s.width = HEIGHT/25.5
         s.height = HEIGHT/25.5
         s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))
