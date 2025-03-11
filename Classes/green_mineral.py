@@ -13,10 +13,6 @@ class Green_Mineral:
         s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))
         s.x-=s.width/2
     def move_and_draw(s,window):
-        global whenwin
         if s.alive == True:
             s.y+=s.dy
             window.blit(s.scaled_img,(s.x,s.y))
-            if s.y >= HEIGHT:
-                s.alive = False
-                whenwin=300

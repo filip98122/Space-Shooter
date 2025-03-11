@@ -58,7 +58,7 @@ minerala=0
 def write(info):
     info["minerala"]=ukupnom
     info["minerala"]=0
-    info={'minerala': 0, 'username': '', 'kojis': 32, 'kojil': 97, 'kojid': 100, 'kojih': 104, 'fire rate': 13, 'highscore': 546, 'damage': 1, 'fire rate missle': 20, 'kojidole': 115, 'kojig': 119, 'asteroid health': 1,}
+    info={'minerala': 0, 'username': '', 'kojis': 32, 'kojil': 97, 'kojid': 100, 'kojih': 104, 'fire rate': 13, 'highscore': 546, 'damage': 1, 'fire rate missle': 180, 'kojidole': 115, 'kojig': 119, 'asteroid health': 1,}
     ens(info)
 go_down_int=info["kojidole"]
 go_up_int=info["kojig"]
@@ -82,31 +82,6 @@ def button_colision(width,height,x,y,mousePos,mouseState):
         return False
 
 
-def mainmenu():
-    global ukupnom
-    global minerala
-    global l_p
-    global boss
-    boss.health=75
-    boss.shoot=50
-    global l_f
-    l_f=[]
-    global l_missle
-    l_missle=[]
-    global p1
-    p1.power_db=0
-    p1.power_rb=0
-    p1.str=""
-    l_p=[]
-    l_a=[]
-    l_l=[]
-    l_e=[]
-    l_m=[]
-    p1.health=3
-    ukupnom+=minerala
-    minerala=0
-    prozor=0
-    part.l_p=[]
     
     
     
@@ -114,8 +89,7 @@ def mainmenu():
     
     
     
-    
-    return l_a,l_l,prozor,l_e,l_m
+
 
 
 def checker(keys,index):

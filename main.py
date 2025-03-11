@@ -73,7 +73,7 @@ from Classes.laser import *
 from Classes.powerup import *
 from Classes.functions import *
 from Classes.store import *
-
+from Classes.wing_cannos import *
 
 
 
@@ -81,7 +81,7 @@ from Classes.store import *
 
 
 l_background = []
-        
+l_wingcannons = []
 
 
 l_attractors=[Attractor(WIDTH/2,HEIGHT/2,0),
@@ -104,26 +104,29 @@ l_attractors=[Attractor(WIDTH/2,HEIGHT/2,0),
 
 
 
-
 """
+
 class Missile:
     def __init__(s, x):
         s.x = x
         s.y = p1.y
         s.angle = 0
-        s.img = pygame.image.load("missle.png")
+        s.img = pygame.image.load("textures/missle.png")
         s.index = -1
         s.dx = 0
         s.dy = -3
-        s.dangle = 5.5
+        s.dangle = 1
         s.desired_angle = 270
         s.alive = True
         s.scale = HEIGHT/12000
-        s.speed = HEIGHT / 150
+        s.speed = HEIGHT / 200
         s.width = s.img.get_width() * s.scale
         s.height = s.img.get_height() * s.scale
         s.y -= s.height
         s.choice = False
+        angle_rad = math.radians(s.angle+90)
+        s.dx = math.cos(angle_rad) * s.speed
+        s.dy = -math.sin(angle_rad) * s.speed  
         s.change()
 
         s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))
@@ -142,52 +145,29 @@ class Missile:
                     s.index = i
 
     def move(s):
+        dx=0
+        dy=3
         if 0 <= s.index < len(l_a):
             target = l_a[s.index]
             s.dx, s.dy = Vector_Normalization(s.x, s.y, target.x + target.width / 2, target.y + target.height / 2)
             s.desired_angle = get_angle(s.dx, s.dy)
+            s.desired_angle %= 360
+            dx = math.cos(math.radians(((s.desired_angle)))) * s.speed
+            dy = math.sin(math.radians(((s.desired_angle)))) * s.speed
         else:
             s.change()
-
-        s.angle %= 360
+        if 0 <= s.index < len(l_a):
+            target = l_a[s.index]
+            s.dx, s.dy = Vector_Normalization(s.x, s.y, target.x + target.width / 2, target.y + target.height / 2)
+            s.desired_angle = get_angle(s.dx, s.dy)
+            s.desired_angle %= 360
+            dx = math.cos(math.radians(((s.desired_angle)))) * s.speed
+            dy = math.sin(math.radians(((s.desired_angle)))) * s.speed
+        s.dx=dx
+        s.dy=dy
+        
         s.desired_angle %= 360
-        if s.angle!=s.desired_angle:
-            
-            v1 = abs(s.desired_angle-s.angle)%360
-            v2 = (s.angle-(-(360-s.desired_angle)))%360
-            
-            if abs(s.desired_angle-s.angle)<=(s.dangle+1):
-                print(10)
-            else:
-                req = s.angle>s.desired_angle and abs(s.angle-s.desired_angle)%360>180
-                if s.choice!=req:
-                    a = 5
-                if not req:
-                    s.angle+=s.dangle
-    
-                else:
-                    s.angle-=s.dangle
-                s.choice = req
-                
-            '''
-            if v1>v2:
-                s.angle-=s.dangle
-            else:
-                s.angle+=s.dangle
-        '''
-        
-    
-        
-        
-        
-        
-        
-        s.angle %= 360  
 
-
-        angle_rad = math.radians(s.angle-180)
-        s.dx = math.cos(angle_rad) * s.speed
-        s.dy = -math.sin(angle_rad) * s.speed  
 
         s.x += s.dx
         s.y += s.dy
@@ -197,7 +177,6 @@ class Missile:
 
         pygame.draw.line(window, (255, 0, 0), (s.x, s.y), (s.x + s.dx * 10000, s.y + s.dy * 10000))
         if 0 <= s.index < len(l_a):
-            target = l_a[s.index]
             pygame.draw.circle(window, (0, 255, 0), (target.x + target.width // 2, target.y + target.height // 2), target.width)
 
         dx = math.cos(math.radians(((s.desired_angle)))) * s.speed
@@ -205,18 +184,45 @@ class Missile:
         pygame.draw.line(window, pygame.Color("Yellow"), (s.x, s.y), (s.x + dx * 10000, s.y + dy * 10000))
 
     def draw(s, window):
-        s.rotated_img = pygame.transform.rotate(s.scaled_img, s.angle-90)
+        s.angle=get_angle(s.dx,s.dy)
+        s.rotated_img = pygame.transform.rotate(s.scaled_img, s.angle)
         s.width = s.rotated_img.get_width()
         s.height = s.rotated_img.get_height()
         window.blit(s.rotated_img, (s.x - s.width / 2, s.y - s.height / 2))
-
-
 
 
 """
 
 
 
+def mainmenu():
+    global ukupnom
+    global minerala
+    global l_p
+    global whenwin
+    global boss
+    boss.health=75
+    boss.shoot=50
+    global l_f
+    l_f=[]
+    global l_wingcannons
+    l_wingcannons=[]
+    global p1
+    p1.power_db=0
+    p1.power_rb=0
+    p1.str=""
+    l_p=[]
+    l_a=[]
+    l_l=[]
+    l_e=[]
+    l_m=[]
+    p1 = Player(WIDTH/2,HEIGHT,0,0,WIDTH/160)
+    ukupnom+=minerala
+    minerala=0
+    prozor=0
+    whenwin=-1
+    part.l_p=[]
+    return l_a,l_l,prozor,l_e,l_m
 
 
 
@@ -238,7 +244,7 @@ l_m = []
 
 
 
-l_a = []
+l_asteroids = []
 l_e = []
 start=50
 SCALE_MAIN_MENU_BUTTON=273.2142857142857
@@ -266,9 +272,9 @@ najvecivreme=0
 
 
 l_s=[
-    Store(WIDTH/7.65,HEIGHT/7.65,"fire rate","Laser exhaust",100,7,-1),
-    Store(WIDTH/7.65,(HEIGHT/7.65)*2,"damage","Laser damage",100,5,1),
-    Store(WIDTH/7.65,(HEIGHT/7.65)*3,"fire rate missle","Missle exhaust",100,15,-2)
+    Store(WIDTH/7.65,HEIGHT/7.65,"fire rate","    Laser exhaust    ",100,7,-1),
+    Store(WIDTH/7.65,(HEIGHT/7.65)*2,"damage","    Laser damage    ",100,5,1),
+    Store(WIDTH/7.65,(HEIGHT/7.65)*3,"fire rate missle","Wing cannon exhaust",100,120,-2)
 ]
 go_down_int=info["kojidole"]
 go_up_int=info["kojig"]
@@ -349,7 +355,7 @@ def win():
 
 
 
-
+whenwin=-1
 
 buttonscrolltimes=1
 buttonscrollloc=0
@@ -385,7 +391,7 @@ whenwin=0
 
 
 
-l_missle=[]
+l_wingcannons=[]
 
 
 q=go_left_int
@@ -435,7 +441,7 @@ godmode=True
 
 
 
-
+boss.shoot=50
 
 
 spawn_background_rate=int(14780/WIDTH)
@@ -479,12 +485,12 @@ while True:
             if event.type == pygame.QUIT:
                 prozor=0
                 render_death_screen=1
-                l_a,l_l,prozor,l_e,l_m=mainmenu()
+                l_asteroids,l_l,prozor,l_e,l_m=mainmenu()
         if keys[pygame.K_ESCAPE]:
             if washolding==False:
                 prozor=0
                 render_death_screen=1
-                l_a,l_l,prozor,l_e,l_m=mainmenu()
+                l_asteroids,l_l,prozor,l_e,l_m=mainmenu()
                 washolding=True
         else:
             washolding=False
@@ -584,9 +590,9 @@ while True:
         if buttonscrollloc<0:
             prozor=3+buttonscrolltimes
 
-        #GO UP CODE IS BELOW ||||||||||||||||||||||||||||||||||||||
-        #GO UP CODE IS BELOW ||||||||||||||||||||||||||||||||||||||
-        #GO UP CODE IS BELOW ||||||||||||||||||||||||||||||||||||||
+        #GO UP CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
+        #GO UP CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
+        #GO UP CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
         if button_colision(lb[7].width,lb[7].height,lb[7].x,lb[7].y,mousePos,mouseState):
             q = checker(keys,go_up_int)
             if q==32:
@@ -600,9 +606,9 @@ while True:
                 lb[7].text_surface = myfont1.render(f"Change go up key from {char[go_up_int-34]}", True, (15, 15, 15))
                 prom(7,lb)
         
-        #GO DOWN CODE IS BELOW ||||||||||||||||||||||||||||||||||||
-        #GO DOWN CODE IS BELOW ||||||||||||||||||||||||||||||||||||
-        #GO DOWN CODE IS BELOW ||||||||||||||||||||||||||||||||||||
+        #GO DOWN CODE IS BELOW |||||||||||||||||||||||||||||||||||||
+        #GO DOWN CODE IS BELOW |||||||||||||||||||||||||||||||||||||
+        #GO DOWN CODE IS BELOW |||||||||||||||||||||||||||||||||||||
         if button_colision(lb[8].width,lb[8].height,lb[8].x,lb[8].y,mousePos,mouseState):
             q = checker(keys,go_down_int)
             if q==32:
@@ -615,12 +621,12 @@ while True:
                 go_down_int=q
                 lb[8].text_surface = myfont1.render(f"Change go down key from {char[go_down_int-34]}", True, (15, 15, 15))
                 prom(8,lb)
-#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
-#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
-#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
-#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
-#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
-#SETTINGS CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||
+#SETTINGS CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||
     if prozor==3:
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
@@ -762,8 +768,6 @@ while True:
         # Spawn new particles if needed
         if random.randint(1,int(HEIGHT/300))==1:
             part.spawn(3,WIDTH/2+WIDTH/2.566666666666667,HEIGHT/2-WIDTH/5.133333333333333,250,-10,HEIGHT/(16.6304347826087*5),(random.randint(118, 138), random.randint(0, 20), random.randint(118, 138)),random.randint(70, 150),0,0)
-        part.draw(window,prozor)
-        part.update(prozor,l_attractors)
         for i in range(len(l_background)):
             l_background[i].move_and_draw(window)
         for i in range(len(lb)):
@@ -817,14 +821,12 @@ while True:
             a_r = random.randint(1,int((14800)/WIDTH))
         if a_r == 1:
             ast = Asteroid(random.randint(0,WIDTH-int(HEIGHT/16.6304347826087)),-int((HEIGHT/16.6304347826087)+10),info['asteroid health'])
-            l_a.append(ast)
+            l_asteroids.append(ast)
         e = random.randint(1,spawn_background_rate)
         if e == 1:
             e = random.randint(0,int(WIDTH-(28*(HEIGHT/1000))))
             l_background.append(Background(e))
         window.fill("Black")
-        part.draw(window,prozor)
-        part.update(prozor,l_attractors)
         for i in range(len(l_background)):
             l_background[i].move_and_draw(window)
         events = pygame.event.get()
@@ -834,14 +836,14 @@ while True:
             if event.type == pygame.QUIT:
                 if info["highscore"]<minerala:
                     info["highscore"]=minerala
-                l_a,l_l,prozor,l_e,l_m=mainmenu()
+                l_asteroids,l_l,prozor,l_e,l_m=mainmenu()
         
               
         if keys[pygame.K_ESCAPE]:
             prozor=0
             if info["highscore"]<minerala:
                 info["highscore"]=minerala
-            l_a,l_l,prozor,l_e,l_m=mainmenu()
+            l_asteroids,l_l,prozor,l_e,l_m=mainmenu()
             washolding=True
         if p1.health==0:
             prozor=-1
@@ -859,36 +861,37 @@ while True:
                 q-=1
             q+=1
         r = 0
-        if boss.health>0 or len(l_a)>0:
-            if keydict["shot"]:
-                if p1.time_missle<=0 and False:
-                    l_missle.append(Missile(p1.x+p1.width/2))
+        if boss.health>0 or len(l_asteroids)>0:
+             if keydict["shot"]:
+                if p1.time_missle<=0:
+                    l_wingcannons.append(Wing_cannons(p1.x,p1.y))
+                    l_wingcannons.append(Wing_cannons(p1.x+p1.width,p1.y))
                     p1.time_missle=info["fire rate missle"]
                 if p1.time <= 0:
-                    l1 = Laser(p1.x+p1.width/2,info["damage"],0,0,p1.y)
+                    l1 = Laser(p1.x+p1.width/2,info["damage"],0,p1,0,p1.y)
                     if p1.power_db>0:
-                        l2=Laser(p1.x+p1.width/2,info["damage"],0,1,p1.y)
+                        l2=Laser(p1.x+p1.width/2,info["damage"],0,p1,1,p1.y)
                         l_l.append(l2)
                     p1.time = info["fire rate"]
                     l_l.append(l1)
                     if p1.power_rb>0:
                         if p1.power_db==0:
                             if p1.str=="r" or p1.str=="" or p1.str=="c":
-                                l1r=Laser(p1.x-p1.width/12.9,info["damage"],45,0,p1.y-(p1.height/11.9)*2)
+                                l1r=Laser(p1.x-p1.width/12.9,info["damage"],45,p1,0,p1.y-(p1.height/11.9)*2)
                                 l_l.append(l1r)
                             if p1.str=="l" or p1.str=="" or p1.str=="c":
-                                l1r=Laser(p1.x+(p1.width/12.9)*9,info["damage"],315,0,p1.y-(p1.height/11.9)*2)
+                                l1r=Laser(p1.x+(p1.width/12.9)*9,info["damage"],315,p1,0,p1.y-(p1.height/11.9)*2)
                                 l_l.append(l1r)
                         else:
                             if p1.str=="r" or p1.str=="" or p1.str=="c":
-                                l1r=Laser(p1.x-p1.width/12.9,info["damage"],45,0,(p1.y-(p1.height/11.9)*2))
+                                l1r=Laser(p1.x-p1.width/12.9,info["damage"],45,p1,0,(p1.y-(p1.height/11.9)*2))
                                 l_l.append(l1r)
-                                l1r=Laser(p1.x-p1.width/12.9,info["damage"],45,1,(p1.y-(p1.height/11.9)*2))
+                                l1r=Laser(p1.x-p1.width/12.9,info["damage"],45,p1,1,(p1.y-(p1.height/11.9)*2))
                                 l_l.append(l1r)
                             if p1.str=="l" or p1.str=="" or p1.str=="c":
-                                l1r=Laser(p1.x+(p1.width/12.9)*9,info["damage"],315,0,(p1.y-(p1.height/11.9)*2))
+                                l1r=Laser(p1.x+(p1.width/12.9)*9,info["damage"],315,p1,0,(p1.y-(p1.height/11.9)*2))
                                 l_l.append(l1r)
-                                l1r=Laser(p1.x+(p1.width/12.9)*9,info["damage"],315,1,(p1.y-(p1.height/11.9)*2))
+                                l1r=Laser(p1.x+(p1.width/12.9)*9,info["damage"],315,p1,1,(p1.y-(p1.height/11.9)*2))
                                 l_l.append(l1r)
 
         for i in range(len(l_l)):
@@ -911,77 +914,97 @@ while True:
             r+=1
         
         #asteroids
-        for i in range(len(l_a)):
-            if l_a[i].strana==0:
-                l_a[i].draw(window)
+        for i in range(len(l_asteroids)):
+            if l_asteroids[i].strana==0:
+                l_asteroids[i].draw(window)
         r = 0
-        for i in range(len(l_a)):
-            if l_a[r].y >= HEIGHT:
-                del l_a[r]
+        for i in range(len(l_asteroids)):
+            if l_asteroids[r].y >= HEIGHT:
+                del l_asteroids[r]
                 r-=1
             r+=1
             
         err = 0
-        for i in range(len(l_a)):
-            if l_a[err].x>=p1.x-l_a[err].width and l_a[err].x<=p1.x+p1.width and l_a[err].y>=p1.y-l_a[err].height and l_a[err].y<=p1.y+p1.height:
+        for i in range(len(l_asteroids)):
+            if l_asteroids[err].x>=p1.x-l_asteroids[err].width and l_asteroids[err].x<=p1.x+p1.width and l_asteroids[err].y>=p1.y-l_asteroids[err].height and l_asteroids[err].y<=p1.y+p1.height:
                 if p1.health!=1:
-                    if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width-p1.height/2.15,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                    if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width-p1.height/2.15,p1.height),pygame.Rect(l_asteroids[err].x,l_asteroids[err].y,l_asteroids[err].width,l_asteroids[err].height)):
                         if p1.health==2:
-                            if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.height/5.608695652173913,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                            if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.height/5.608695652173913,p1.height),pygame.Rect(l_asteroids[err].x,l_asteroids[err].y,l_asteroids[err].width,l_asteroids[err].height)):
                                 p1.str="l"
-                            elif collision1(pygame.Rect(p1.x+p1.height/2.433962264150943,p1.y,p1.height/5.608695652173913,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                            elif collision1(pygame.Rect(p1.x+p1.height/2.433962264150943,p1.y,p1.height/5.608695652173913,p1.height),pygame.Rect(l_asteroids[err].x,l_asteroids[err].y,l_asteroids[err].width,l_asteroids[err].height)):
                                 p1.str="c"
                             else:
                                 p1.str="r"
                         if godmode:
                             p1.health-=1
-                        l_a[err].alive=0
-                        l_a[err].drop=False
+                        l_asteroids[err].alive=0
+                        l_asteroids[err].drop=False
                 else:
                     if p1.str=="l":
-                        if collision1(pygame.Rect(p1.x,p1.y,p1.width-p1.height/4.3,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                        if collision1(pygame.Rect(p1.x,p1.y,p1.width-p1.height/4.3,p1.height),pygame.Rect(l_asteroids[err].x,l_asteroids[err].y,l_asteroids[err].width,l_asteroids[err].height)):
                             if godmode:
                                 p1.health-=1 
-                            l_a[err].alive=0
-                            l_a[err].drop=False
+                            l_asteroids[err].alive=0
+                            l_asteroids[err].drop=False
                     elif p1.str=="r":
-                        if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                        if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width,p1.height),pygame.Rect(l_asteroids[err].x,l_asteroids[err].y,l_asteroids[err].width,l_asteroids[err].height)):
                             if godmode:
                                 p1.health-=1
-                            l_a[err].alive=0
-                            l_a[err].drop=False
+                            l_asteroids[err].alive=0
+                            l_asteroids[err].drop=False
                     else:
-                        if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width-p1.height/2.15,p1.height),pygame.Rect(l_a[err].x,l_a[err].y,l_a[err].width,l_a[err].height)):
+                        if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width-p1.height/2.15,p1.height),pygame.Rect(l_asteroids[err].x,l_asteroids[err].y,l_asteroids[err].width,l_asteroids[err].height)):
                             if godmode:
                                 p1.health-=1
-                            l_a[err].alive=0
-                            l_a[err].drop=False
+                            l_asteroids[err].alive=0
+                            l_asteroids[err].drop=False
             err +=1
         for i in range(len(l_l)):
-            for j in range(len(l_a)):
+            for j in range(len(l_asteroids)):
                 
-                if collision1(pygame.Rect(l_l[i].x,l_l[i].y,l_l[i].width,l_l[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):         
-                    if l_a[j].alive >= 0:
+                if collision1(pygame.Rect(l_l[i].x,l_l[i].y,l_l[i].width,l_l[i].height),pygame.Rect(l_asteroids[j].x,l_asteroids[j].y,l_asteroids[j].width,l_asteroids[j].height)):         
+                    if l_asteroids[j].alive >= 0:
                         l_l[i].health-=1
-                        l_a[j].alive-=info['damage']
+                        for ii in range(10):
+                            part.spawn(2,l_l[i].x+l_l[i].width/2,l_l[i].y+l_l[i].height/2,random.randint(10,60),-1,HEIGHT/180,(random.randint(17, 77),random.randint(205, 255),random.randint(186,246)),random.randint(70, 150),1,random.randint(0,40))
+                        l_asteroids[j].alive-=info['damage']
         
         
         
         
         
-        for i in range(len(l_missle)):
-            for j in range(len(l_a)):
-                if collision1(pygame.Rect(l_missle[i].x-l_missle[i].width/2,l_missle[i].y-l_missle[i].height/2,l_missle[i].width,l_missle[i].height),pygame.Rect(l_a[j].x,l_a[j].y,l_a[j].width,l_a[j].height)):
-                    l_a[j].alive=0
-                    l_missle[i].alive=False
+        for i in range(len(l_wingcannons)):
+            for j in range(len(l_asteroids)):
+                if collision1(pygame.Rect(l_wingcannons[i].x,l_wingcannons[i].y,l_wingcannons[i].width,l_wingcannons[i].height),pygame.Rect(l_asteroids[j].x,l_asteroids[j].y,l_asteroids[j].width,l_asteroids[j].height)):
+                    l_asteroids[j].alive=0
+                    for ii in range(10):
+                        part.spawn(2,l_asteroids[j].x+l_asteroids[j].width/2,l_asteroids[j].y+l_asteroids[j].height/2,random.randint(10,60),-1,HEIGHT/180,(random.randint(113, 173),random.randint(100, 160),random.randint(3,63)),random.randint(70, 150),1,random.randint(0,40))
+        if boss.health>0:
+            for i in range(len(l_wingcannons)):
+                if collision1(pygame.Rect(l_wingcannons[i].x,l_wingcannons[i].y,l_wingcannons[i].width,l_wingcannons[i].height),pygame.Rect(boss.x,boss.y,boss.width,boss.height)):
+                    l_wingcannons[i].alive=False
+                    boss.health-=3
+                    for ii in range(10):
+                        part.spawn(2,l_wingcannons[i].x+l_wingcannons[i].width/2,l_wingcannons[i].y+l_wingcannons[i].height/2,random.randint(10,60),-1,HEIGHT/180,(random.randint(113, 173),random.randint(100, 160),random.randint(3,63)),random.randint(70, 150),1,random.randint(0,40))
+                    if boss.health<=0:
+                        a_r=2
+                        for j in range(1,4):
+                            for i in range(5):
+                                timeSpread = (i*5)*j
+                                scaleSpread = HEIGHT/425-(i/10)*2
+                                e = Explosion(random.randint(int(boss.x-HEIGHT/30),int(boss.x+boss.width-HEIGHT/90)),random.randint(int(boss.y-HEIGHT/30),int(boss.y+boss.height-HEIGHT/90)),int(HEIGHT/16.6304347826087),int(HEIGHT/16.6304347826087),timeSpread,scaleSpread)
+                                l_e.append(e)
+                        gm=Green_Mineral(boss.x+boss.width/2,boss.y,HEIGHT/306)
+                        break
+        
+        
         err=0
-        for i in range(len(l_missle)):
-            if l_missle[err].alive==True:
-                l_missle[err].change()
-                l_missle[err].move()
-                l_missle[err].draw(window)
+        for i in range(len(l_wingcannons)):
+            if l_wingcannons[err].alive==True:
+                l_wingcannons[err].general(window)
             else:
-                del l_missle[err]
+                del l_wingcannons[err]
                 err-=1
             err+=1
     
@@ -994,25 +1017,25 @@ while True:
         
         
         err = 0
-        for i in range(len(l_a)):
-            if l_a[err].alive <= 0:
-                if l_a[err].drop==True:
+        for i in range(len(l_asteroids)):
+            if l_asteroids[err].alive <= 0:
+                if l_asteroids[err].drop==True:
                     prob_powerup= random.randint(1,15)
                     if prob_powerup==1:
-                        p=Power_up(l_a[err].x,l_a[err].y,"rb")
+                        p=Power_up(l_asteroids[err].x,l_asteroids[err].y,"rb")
                         l_p.append(p)
                     elif prob_powerup==2:
-                        p=Power_up(l_a[err].x,l_a[err].y,"db")
+                        p=Power_up(l_asteroids[err].x,l_asteroids[err].y,"db")
                         l_p.append(p)
                     else:
-                        m = Mineral(l_a[err].x,l_a[err].y,HEIGHT/306)
+                        m = Mineral(l_asteroids[err].x,l_asteroids[err].y,HEIGHT/306)
                         l_m.append(m)
                 for i in range(5):
                     timeSpread = i*5
                     scaleSpread = HEIGHT/425-(i/10)*2
-                    e = Explosion(random.randint(int(l_a[err].x-HEIGHT/30),int(l_a[err].x+l_a[err].width-HEIGHT/90)),random.randint(int(l_a[err].y-HEIGHT/30),int(l_a[err].y+l_a[err].height-HEIGHT/90)),l_a[err].width,l_a[err].height,timeSpread,scaleSpread)
+                    e = Explosion(random.randint(int(l_asteroids[err].x-HEIGHT/30),int(l_asteroids[err].x+l_asteroids[err].width-HEIGHT/90)),random.randint(int(l_asteroids[err].y-HEIGHT/30),int(l_asteroids[err].y+l_asteroids[err].height-HEIGHT/90)),l_asteroids[err].width,l_asteroids[err].height,timeSpread,scaleSpread)
                     l_e.append(e)
-                del l_a[err]
+                del l_asteroids[err]
                 err-=1
             err+=1
         
@@ -1038,7 +1061,7 @@ while True:
                 minerala +=1
                 l_m[i].alive = False
                 for ii in range(10):
-                    part.spawn(1,l_m[i].x+l_m[i].width/2,l_m[i].y+l_m[i].height/2,random.randint(20,120),-1,HEIGHT/180,(random.randint(140, 200),0,0),random.randint(70, 150),1,random.randint(0,40))
+                    part.spawn(2,l_m[i].x+l_m[i].width/2,l_m[i].y+l_m[i].height/2,random.randint(20,120),-1,HEIGHT/180,(random.randint(140, 200),0,0),random.randint(70, 150),1,random.randint(0,40))
                 
         err = 0
         for i in range(len(l_m)):
@@ -1050,13 +1073,13 @@ while True:
         p1.draw(window)
         p1.move(keydict)
         #asteroids
-        for i in range(len(l_a)):
-            if l_a[i].strana==1:
-                l_a[i].draw(window)
+        for i in range(len(l_asteroids)):
+            if l_asteroids[i].strana==1:
+                l_asteroids[i].draw(window)
         r = 0
-        for i in range(len(l_a)):
-            if l_a[r].y >= HEIGHT:
-                del l_a[r]
+        for i in range(len(l_asteroids)):
+            if l_asteroids[r].y >= HEIGHT:
+                del l_asteroids[r]
                 r-=1
             r+=1
         
@@ -1079,7 +1102,7 @@ while True:
             
             
         if boss.health>0:
-            boss.general(window,l_f)
+            boss.general(window,l_f,p1)
             
         
         err=0
@@ -1119,6 +1142,8 @@ while True:
             for i in range(len(l_l)):
                 if collision1(pygame.Rect(boss.x,boss.y,boss.width,boss.height),pygame.Rect(l_l[i].x,l_l[i].y,l_l[i].width,l_l[i].height)):
                     boss.health-=info["damage"]
+                    for ii in range(10):
+                        part.spawn(2,l_l[i].x+l_l[i].width/2,l_l[i].y+l_l[i].height/2,random.randint(10,60),-1,HEIGHT/180,(random.randint(17, 77),random.randint(205, 255),random.randint(186,246)),random.randint(70, 150),1,random.randint(0,40))
                     l_l[i].health-=1
                     if boss.health<=0:
                         a_r=2
@@ -1136,6 +1161,9 @@ while True:
                     minerala+=50
                     gm.alive=False
                     whenwin=300
+                if gm.y >= HEIGHT:
+                    gm.alive = False
+                    whenwin=300
             
         
         
@@ -1145,9 +1173,24 @@ while True:
             whenwin-=1
             if whenwin==0:
                 prozor=0
-                l_a,l_l,prozor,l_e,l_m=mainmenu()
+                l_asteroids,l_l,prozor,l_e,l_m=mainmenu()
             win()
-        
+        if boss.health<=50 and boss.h50:
+            for i in range(2):
+                timeSpread = i*5
+                scaleSpread = HEIGHT/425-(i/10)*2
+                e = Explosion(random.randint(int(boss.x-HEIGHT/30),int(boss.x+boss.width-HEIGHT/90)),random.randint(int(boss.y-HEIGHT/30),int(boss.y+boss.height-HEIGHT/90)),int(HEIGHT/16.6304347826087),int(HEIGHT/16.6304347826087),timeSpread,scaleSpread)
+                l_e.append(e)
+            boss.h50=False
+        if boss.health<=25 and boss.h25:
+            for i in range(3):
+                timeSpread = i*5
+                scaleSpread = HEIGHT/425-(i/10)*2
+                e = Explosion(random.randint(int(boss.x-HEIGHT/30),int(boss.x+boss.width-HEIGHT/90)),random.randint(int(boss.y-HEIGHT/30),int(boss.y+boss.height-HEIGHT/90)),int(HEIGHT/16.6304347826087),int(HEIGHT/16.6304347826087),timeSpread,scaleSpread)
+                l_e.append(e)
+            boss.h25=False
+    part.draw(window,prozor)
+    part.update(prozor,l_attractors)
         
     pygame.display.update()
     clock.tick(65)

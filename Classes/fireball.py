@@ -1,7 +1,6 @@
 import pygame
 pygame.init()
 import math
-from Classes.player import *
 WIDTH,HEIGHT=1540,900
 def Vector_Normalization(x1, y1, x2, y2):
     # Calculate dx and dy with direction
@@ -14,7 +13,7 @@ def Vector_Normalization(x1, y1, x2, y2):
     distancey*=HEIGHT/150 # For speed
     return distancex,distancey
 class Fireball:
-    def __init__(s,x,y):
+    def __init__(s,x,y,p1):
         s.health=1
         s.x=x
         s.y=y

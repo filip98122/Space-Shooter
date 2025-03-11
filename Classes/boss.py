@@ -1,6 +1,5 @@
 import pygame
 pygame.init()
-import math
 from Classes.fireball import *
 WIDTH,HEIGHT=1540,900
 class Boss:
@@ -15,13 +14,15 @@ class Boss:
         s.shoot=0
         s.x-=s.width/2
         s.health = 75
-    def general(s,window,l_f):
+        s.h25=True
+        s.h50=True
+    def general(s,window,l_f,p1):
         window.blit(s.scaled_img,(s.x,s.y))
         if s.shoot==0:
-            s.make_fireball(l_f)
+            s.make_fireball(l_f,p1)
             s.shoot=50
         else:
             s.shoot-=1
-    def make_fireball(s,l_f):
-        l_f.append(Fireball(s.x+s.width/2,s.y+s.height))
+    def make_fireball(s,l_f,p1):
+        l_f.append(Fireball(s.x+s.width/2,s.y+s.height,p1))
 boss = Boss(WIDTH/2,100)

@@ -34,6 +34,12 @@ class Player:
         s.width=s.height
         q=pygame.transform.scale(img, (s.width, s.height))
         
+        
+        
+        s.y-=s.height*(HEIGHT/600)
+        s.x-=s.width/2
+        
+        
         img = pygame.image.load('textures/1l.png')
         s.height = img.get_height()*scale
         s.width=s.height
@@ -96,4 +102,4 @@ class Player:
             s.power_rb-=1
         if s.power_db>0:
             s.power_db-=1
-p1 = Player(100,550,0,0,WIDTH/160)
+p1 = Player(WIDTH/2,HEIGHT,0,0,WIDTH/160)

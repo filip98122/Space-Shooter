@@ -6,7 +6,7 @@ WIDTH,HEIGHT=1540,900
 
 
 class Laser:
-    def __init__(s,x,health,angle,str=0,y=p1.y):
+    def __init__(s,x,health,angle,p1,str=0,y=p1.y):
         s.x = x
         s.y=y
         s.angle=angle
@@ -28,10 +28,10 @@ class Laser:
                 if s.angle==0:
                     s.x-=s.width
                 else:
-                    s.y-=l_l[len(l_l)-1].width/2
+                    s.y-=s.width/2
             else:
                 if s.angle!=0:
-                    s.y+=l_l[len(l_l)-1].width/2
+                    s.y+=s.width/2
         else:
             s.x-=s.width/2
         if s.angle==45:
@@ -43,7 +43,7 @@ class Laser:
         s.rotated_img=pygame.transform.rotate(s.scaled_img,s.angle)
     def draw(s,window):
         if s.health >0:
-            if s.y <= -53*0.75:
+            if s.y <= 0-s.height:
                 s.health =0
             s.y+=s.dy
             s.dy+=s.ddy
