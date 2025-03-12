@@ -2,12 +2,13 @@ import pygame
 pygame.init()
 from Classes.fireball import *
 WIDTH,HEIGHT=1540,900
+from Classes.loader import *
 class Boss:
     def __init__(s,x,y):
         s.x=x
         s.y=y
         s.scale=HEIGHT/900
-        img1=pygame.image.load(f"textures/boss.png")
+        img1=images[9]
         s.width=img1.get_width()*s.scale
         s.height=img1.get_height()*s.scale
         s.scaled_img=pygame.transform.scale(img1,(s.width,s.height))

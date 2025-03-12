@@ -1,7 +1,7 @@
 import pygame
 pygame.init()
 WIDTH,HEIGHT=1540,900
-
+from Classes.loader import *
 class Power_up:
     def __init__(s,x,y,vrsta):
         s.x=x
@@ -9,7 +9,10 @@ class Power_up:
         s.speed=HEIGHT/306
         s.alive=True
         s.link=vrsta
-        s.image=pygame.image.load(f"textures/powerup{vrsta}.png")
+        if s.link=="db":
+            s.image=images[26]
+        else:
+            s.image=images[27]
         s.height = HEIGHT/17
         s.width = HEIGHT/17
         s.scaled_img = pygame.transform.scale(s.image, (s.width, s.height))

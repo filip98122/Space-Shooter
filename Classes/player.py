@@ -1,6 +1,7 @@
 import pygame
 pygame.init()
 WIDTH,HEIGHT=1540,900
+from Classes.loader import *
 class Player:
     """Moves and draws the player"""
     def __init__(s,x,y,dx,time,speed):
@@ -16,20 +17,20 @@ class Player:
         s.time_missle=0
         s.dy=0
         scale=HEIGHT/5940.594059405941
-        img = pygame.image.load('textures/1c.png')
+        img = images[21]
         s.height = img.get_height()*scale
         s.width = s.height
         e=pygame.transform.scale(img, (s.width, s.height))
         
         
-        img = pygame.image.load('textures/2.png')
+        img = images[22]
         s.height = img.get_height()*scale
         s.width = s.height
         w=pygame.transform.scale(img, (s.width, s.height))
         
         
         
-        img = pygame.image.load('textures/3.png')
+        img = images[23]
         s.height = img.get_height()*scale
         s.width=s.height
         q=pygame.transform.scale(img, (s.width, s.height))
@@ -40,12 +41,12 @@ class Player:
         s.x-=s.width/2
         
         
-        img = pygame.image.load('textures/1l.png')
+        img = images[24]
         s.height = img.get_height()*scale
         s.width=s.height
         t=pygame.transform.scale(img, (s.width, s.height))
         
-        img = pygame.image.load('textures/1r.png')
+        img = images[25]
         s.height = img.get_height()*scale
         s.width=s.height
         r=pygame.transform.scale(img, (s.width, s.height))

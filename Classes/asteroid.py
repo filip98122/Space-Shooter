@@ -2,6 +2,7 @@ import pygame
 import random
 pygame.init()
 WIDTH,HEIGHT=1540,900
+from Classes.loader import *
 class Asteroid:
     def __init__(s,x,y,alive):
         s.x = x
@@ -13,13 +14,13 @@ class Asteroid:
         s.img_choice = random.randint(1,4)
         s.speed = random.randint(int(HEIGHT/382.5),int(HEIGHT/153))
         if s.img_choice == 1:
-            s.image = pygame.image.load("textures/asteroid1.png")
+            s.image = images['asteroid1']
         if s.img_choice == 2:
-            s.image = pygame.image.load("textures/asteroid2.png")
+            s.image = images['asteroid2']
         if s.img_choice == 3:
-            s.image = pygame.image.load("textures/asteroid3.png")
+            s.image = images['asteroid3']
         if s.img_choice == 4:
-            s.image = pygame.image.load("textures/asteroid4.png")
+            s.image = images['asteroid4']
             
         
         s.height = int(HEIGHT/16.6304347826087)

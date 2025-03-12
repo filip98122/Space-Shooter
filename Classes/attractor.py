@@ -2,12 +2,13 @@ import pygame
 import random
 pygame.init()
 WIDTH,HEIGHT=1540,900
+from Classes.loader import *
 class Attractor:
     def __init__(s,x,y,prozor):
         s.x=x
         s.y=y
         s.prozor=prozor
-        s.img = pygame.image.load("textures/particle_red.png")
+        s.img = images['particle_red']
         s.width = HEIGHT/25.5
         s.height = HEIGHT/25.5
         s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))

@@ -58,7 +58,7 @@ window = pygame.display.set_mode((WIDTH,HEIGHT))
 
 
 
-
+from Classes.loader import *
 from Classes.background import *
 from Classes.player import *
 from Classes.particle_and_particle_system import *
@@ -1193,7 +1193,7 @@ while True:
     part.update(prozor,l_attractors)
         
     pygame.display.update()
-    clock.tick(65)
+    clock.tick(73)
     SVAKIH30+=1
     if SVAKIH30==30:
         SVAKIH30=0

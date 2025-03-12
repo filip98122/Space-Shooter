@@ -2,6 +2,7 @@ import pygame
 pygame.init()
 import math
 WIDTH,HEIGHT=1540,900
+from Classes.loader import *
 def Vector_Normalization(x1, y1, x2, y2):
     # Calculate dx and dy with direction
     distancex = x2 - x1
@@ -18,7 +19,7 @@ class Fireball:
         s.x=x
         s.y=y
         s.scale=HEIGHT/1800
-        img1=pygame.image.load(f"textures/fireball.png")
+        img1=images[17]
         s.width=img1.get_width()*s.scale
         s.height=img1.get_height()*s.scale
         s.scaled_img=pygame.transform.scale(img1,(s.width,s.height))

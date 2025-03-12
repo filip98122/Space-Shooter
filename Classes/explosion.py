@@ -1,5 +1,6 @@
 import pygame
 pygame.init()
+from Classes.loader import *
 class Explosion:
     def __init__(s,x,y,w,h,time,ss):
         s.x= x
@@ -14,7 +15,7 @@ class Explosion:
         
         s.images={}
         for i in range(7):
-            s.img = pygame.image.load(f"textures/explosion{i}.png")
+            s.img = images[i+10]
             s.width1=s.w*s.ss
             s.height1=s.h*s.ss
             s.scaled_img1 = pygame.transform.scale(s.img, (s.width1, s.height1))

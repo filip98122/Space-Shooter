@@ -1,11 +1,12 @@
 import pygame
 pygame.init()
 WIDTH,HEIGHT=1540,900
+from Classes.loader import *
 class Wing_cannons:
     def __init__(s,x,y):
         s.x=x
         s.y=y
-        s.img = pygame.image.load('textures/bullet.png')
+        s.img = images[28]
         s.width = s.img.get_width()*(HEIGHT/(3400*6))
         s.height = s.img.get_height()*(HEIGHT/(3400*6))
         s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))
