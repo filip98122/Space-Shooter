@@ -31,6 +31,7 @@ class Loader():
         loaded[26]=pygame.image.load('textures/powerupdb.png')
         loaded[27]=pygame.image.load('textures/poweruprb.png')
         loaded[28]=pygame.image.load("textures/bullet.png")
+        loaded[29]=pygame.transform.flip(pygame.image.load("textures/drone.png"),False,True)
         
         loaded['asteroid1']=s.image1
         loaded['asteroid2']=s.image2

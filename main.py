@@ -23,10 +23,10 @@ keyE = b'nL5cTPi0324Gk2zgRDR6E4Y2iVHfWnrKu4kGzcB1ZnU='
 """
 render_death_screen
 e2
-l_p
+l_powerup
 vremep
 kojig
-wsmmb #Luka tata mi je vo rekao tako da ne bi morao da ponavljam WIDTH/SCALE_MAIN_MENU_BUTTON. Ima jos 3 takva(hsmmb,wssb,hssb)
+wsmmb #Luka tata mi je to rekao tako da ne bi morao da ponavljam WIDTH/SCALE_MAIN_MENU_BUTTON. Ima jos 3 takva(hsmmb,wssb,hssb)
 
 These are actual variable names...    
 """
@@ -74,133 +74,28 @@ from Classes.powerup import *
 from Classes.functions import *
 from Classes.store import *
 from Classes.wing_cannos import *
+from Classes.drone import *
 
 
 
 
-
-
+l_drones=[]
 l_background = []
 l_wingcannons = []
 
 
 l_attractors=[Attractor(WIDTH/2,HEIGHT/2,0),
-              Attractor(WIDTH/2,HEIGHT/2,0)
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              
-]
-#l_attractors=[]
-
-
-
-
-
-
-"""
-
-class Missile:
-    def __init__(s, x):
-        s.x = x
-        s.y = p1.y
-        s.angle = 0
-        s.img = pygame.image.load("textures/missle.png")
-        s.index = -1
-        s.dx = 0
-        s.dy = -3
-        s.dangle = 1
-        s.desired_angle = 270
-        s.alive = True
-        s.scale = HEIGHT/12000
-        s.speed = HEIGHT / 200
-        s.width = s.img.get_width() * s.scale
-        s.height = s.img.get_height() * s.scale
-        s.y -= s.height
-        s.choice = False
-        angle_rad = math.radians(s.angle+90)
-        s.dx = math.cos(angle_rad) * s.speed
-        s.dy = -math.sin(angle_rad) * s.speed  
-        s.change()
-
-        s.scaled_img = pygame.transform.scale(s.img, (s.width, s.height))
-
-    def change(s):
-        min_distance = float("inf")
-        s.index = -1
-
-        for i in range(len(l_a)):
-            if l_a[i].alive:
-                dx = l_a[i].x - s.x
-                dy = l_a[i].y - s.y
-                distance = math.sqrt(dx * dx + dy * dy)
-                if distance < min_distance:
-                    min_distance = distance
-                    s.index = i
-
-    def move(s):
-        dx=0
-        dy=3
-        if 0 <= s.index < len(l_a):
-            target = l_a[s.index]
-            s.dx, s.dy = Vector_Normalization(s.x, s.y, target.x + target.width / 2, target.y + target.height / 2)
-            s.desired_angle = get_angle(s.dx, s.dy)
-            s.desired_angle %= 360
-            dx = math.cos(math.radians(((s.desired_angle)))) * s.speed
-            dy = math.sin(math.radians(((s.desired_angle)))) * s.speed
-        else:
-            s.change()
-        if 0 <= s.index < len(l_a):
-            target = l_a[s.index]
-            s.dx, s.dy = Vector_Normalization(s.x, s.y, target.x + target.width / 2, target.y + target.height / 2)
-            s.desired_angle = get_angle(s.dx, s.dy)
-            s.desired_angle %= 360
-            dx = math.cos(math.radians(((s.desired_angle)))) * s.speed
-            dy = math.sin(math.radians(((s.desired_angle)))) * s.speed
-        s.dx=dx
-        s.dy=dy
-        
-        s.desired_angle %= 360
-
-
-        s.x += s.dx
-        s.y += s.dy
-
-        if s.x + s.width / 2 < 0 or s.x - s.width / 2 > WIDTH or s.y + s.height / 2 < 0 or s.y + s.height / 2 > HEIGHT:
-            s.alive = False
-
-        pygame.draw.line(window, (255, 0, 0), (s.x, s.y), (s.x + s.dx * 10000, s.y + s.dy * 10000))
-        if 0 <= s.index < len(l_a):
-            pygame.draw.circle(window, (0, 255, 0), (target.x + target.width // 2, target.y + target.height // 2), target.width)
-
-        dx = math.cos(math.radians(((s.desired_angle)))) * s.speed
-        dy = math.sin(math.radians(((s.desired_angle)))) * s.speed
-        pygame.draw.line(window, pygame.Color("Yellow"), (s.x, s.y), (s.x + dx * 10000, s.y + dy * 10000))
-
-    def draw(s, window):
-        s.angle=get_angle(s.dx,s.dy)
-        s.rotated_img = pygame.transform.rotate(s.scaled_img, s.angle)
-        s.width = s.rotated_img.get_width()
-        s.height = s.rotated_img.get_height()
-        window.blit(s.rotated_img, (s.x - s.width / 2, s.y - s.height / 2))
-
-
-"""
-
-
-
+              Attractor(WIDTH/2,HEIGHT/2,0)]
 def mainmenu():
     global ukupnom
     global minerala
-    global l_p
+    global l_powerup
     global whenwin
     global boss
+    global l_drones
+    l_drones=[]
+    for i in range(10):
+        l_drones.append(Drone((WIDTH+((WIDTH-(5*(WIDTH/15.4)))/2))+(i*(HEIGHT/18))+(HEIGHT/36),400,-1))
     boss.health=75
     boss.shoot=50
     global l_f
@@ -211,7 +106,7 @@ def mainmenu():
     p1.power_db=0
     p1.power_rb=0
     p1.str=""
-    l_p=[]
+    l_powerup=[]
     l_a=[]
     l_l=[]
     l_e=[]
@@ -223,27 +118,7 @@ def mainmenu():
     whenwin=-1
     part.l_p=[]
     return l_a,l_l,prozor,l_e,l_m
-
-
-
 l_m = []
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 l_asteroids = []
 l_e = []
 start=50
@@ -267,10 +142,8 @@ lb=[Button(WIDTH/2,HEIGHT/4,"start","",0,0,wsmmb,hsmmb),
     Button(WIDTH/2,HEIGHT/6*2,"zapucanje","Change go down key from s",myfont1,4,wssb,hssb)
 ]
 
-l_p=[]
+l_powerup=[]
 najvecivreme=0
-
-
 l_s=[
     Store(WIDTH/7.65,HEIGHT/7.65,"fire rate","    Laser exhaust    ",100,7,-1),
     Store(WIDTH/7.65,(HEIGHT/7.65)*2,"damage","    Laser damage    ",100,5,1),
@@ -292,35 +165,9 @@ if q>=33 and q<=126:
     shoot_int=q
     lb[3].text_surface = myfont1.render(f"Change shoot key from {char[shoot_int-34]}", True, (15, 15, 15))
 
-
-
-
-
-
-
-
-
-
-
-
-
+for i in range(10):
+    l_drones.append(Drone((WIDTH+((WIDTH-(5*(WIDTH/15.4)))/2))+(i*(HEIGHT/18))+(HEIGHT/36),400,-1))
 #zakasnije
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 q=go_up_int
 if q==32:
     info["kojig"]=q
@@ -357,6 +204,7 @@ def win():
 
 whenwin=-1
 
+
 buttonscrolltimes=1
 buttonscrollloc=0
 def button_scroll():
@@ -373,27 +221,8 @@ height1=text_surface.get_height()
 imgs=pygame.transform.scale(img,(width,height))
 x,y=WIDTH/2-width/2,lb[6].y+lb[6].height
 x1,y1=WIDTH/2-width1/2,lb[6].y+lb[6].height+height/2-height1/2
-
-
-
-
-
-
-
 whenwin=0
-
-
-
-
-
-
-
-
-
-
 l_wingcannons=[]
-
-
 q=go_left_int
 if q==32:
     go_left_int=q
@@ -403,8 +232,6 @@ if q>=33 and q<=126:
     go_left_int=q
     info["kojil"]=q
     lb[4].text_surface = myfont1.render(f"Change go left key from {char[go_left_int-34]}", True, (15, 15, 15))
-
-
 q=go_right_int
 if q==32:
     go_right_int=q
@@ -415,8 +242,6 @@ if q>=33 and q<=126:
     info["kojid"]=q
     lb[5].text_surface = myfont1.render(f"Change go right key from {char[go_right_int-34]}", True, (15, 15, 15))
 button_scrollhold=False
-
-
 q=heal_int
 if q==32:
     heal_int=q
@@ -432,18 +257,8 @@ prom(5,lb)
 prom(6,lb)
 prom(7,lb)
 prom(8,lb)
-
-
-
-godmode=True
-
-
-
-
-
+godmode=False
 boss.shoot=50
-
-
 spawn_background_rate=int(14780/WIDTH)
 render_death_screen=1
 ukupnom=info["minerala"]
@@ -452,7 +267,6 @@ prozor=0
 washolding=False
 vremepre=time.time()
 while True:
-    vremep=time.time()
     if prozor==-1:
         if render_death_screen==1:
             render_death_screen=0
@@ -466,7 +280,6 @@ while True:
             txtsw2=txts.get_width()
             txts2= font2.render(f"You died!", True,  (255, 255, 255))
             txtsw1=txts1.get_width()
-        
         window.fill("Black")
         e = random.randint(1,spawn_background_rate)
         if e == 1:
@@ -494,22 +307,6 @@ while True:
                 washolding=True
         else:
             washolding=False
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 #STORE CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||||
 #STORE CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||||
 #STORE CODE IS BELOW ||||||||||||||||||||||||||||||||||||||||||||||
@@ -589,7 +386,6 @@ while True:
             buttonscrollloc=0
         if buttonscrollloc<0:
             prozor=3+buttonscrolltimes
-
         #GO UP CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
         #GO UP CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
         #GO UP CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
@@ -605,7 +401,6 @@ while True:
                 go_up_int=q
                 lb[7].text_surface = myfont1.render(f"Change go up key from {char[go_up_int-34]}", True, (15, 15, 15))
                 prom(7,lb)
-        
         #GO DOWN CODE IS BELOW |||||||||||||||||||||||||||||||||||||
         #GO DOWN CODE IS BELOW |||||||||||||||||||||||||||||||||||||
         #GO DOWN CODE IS BELOW |||||||||||||||||||||||||||||||||||||
@@ -723,10 +518,7 @@ while True:
                 heal_int=q
                 info["kojih"]=q
                 lb[6].text_surface = myfont1.render(f"Change heal key from {char[heal_int-34]}", True, (15, 15, 15))
-                prom(6,lb)
-    
-
-        
+                prom(6,lb)   
     #MAIN MENU CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
     #MAIN MENU CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
     #MAIN MENU CODE IS BELOW |||||||||||||||||||||||||||||||||||||||
@@ -773,12 +565,9 @@ while True:
         for i in range(len(lb)):
             if lb[i].prozor==0:
                 lb[i].draw(window)
-        if button_colision(lb[0].width,lb[0].height,lb[0].x,lb[0].y,mousePos,mouseState):
-            prozor=1
-        if button_colision(lb[1].width,lb[1].height,lb[1].x,lb[1].y,mousePos,mouseState):
-            prozor=3
-        if button_colision(lb[2].width,lb[2].height,lb[2].x,lb[2].y,mousePos,mouseState):
-            prozor=2
+        if button_colision(lb[0].width,lb[0].height,lb[0].x,lb[0].y,mousePos,mouseState):prozor=1
+        if button_colision(lb[1].width,lb[1].height,lb[1].x,lb[1].y,mousePos,mouseState):prozor=3
+        if button_colision(lb[2].width,lb[2].height,lb[2].x,lb[2].y,mousePos,mouseState):prozor=2
     #GAME CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||||||
     #GAME CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||||||
     #GAME CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||||||
@@ -786,6 +575,8 @@ while True:
     #GAME CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||||||
     #GAME CODE IS BELOW |||||||||||||||||||||||||||||||||||||||||||||||
     if prozor==1:
+        if godmode==False:
+            p1.health=3
         if info["fire rate"]<7:
             info["fire rate"]=7
         keys = pygame.key.get_pressed()
@@ -801,22 +592,6 @@ while True:
         keydict["heal"]=heluj
         keydict["up"]=gore
         keydict["down"]=dole
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         if boss.health>0:
             a_r = random.randint(1,int((14800)/WIDTH))
         if a_r == 1:
@@ -837,8 +612,6 @@ while True:
                 if info["highscore"]<minerala:
                     info["highscore"]=minerala
                 l_asteroids,l_l,prozor,l_e,l_m=mainmenu()
-        
-              
         if keys[pygame.K_ESCAPE]:
             prozor=0
             if info["highscore"]<minerala:
@@ -850,9 +623,6 @@ while True:
             if info["highscore"]<minerala:
                 info["highscore"]=minerala
         draw_minerals(HEIGHT/30.6,HEIGHT/30.6,window,minerala)
-        
-        
-            
         #laser
         q = 0
         for i in range(len(l_l)):
@@ -860,7 +630,7 @@ while True:
                 del l_l[q]
                 q-=1
             q+=1
-        r = 0
+        indexdelete = 0
         if boss.health>0 or len(l_asteroids)>0:
              if keydict["shot"]:
                 if p1.time_missle<=0:
@@ -893,11 +663,9 @@ while True:
                                 l_l.append(l1r)
                                 l1r=Laser(p1.x+(p1.width/12.9)*9,info["damage"],315,p1,1,(p1.y-(p1.height/11.9)*2))
                                 l_l.append(l1r)
-
         for i in range(len(l_l)):
             if l_l[i].health != 0:
                 l_l[i].draw(window)
-        
         #background
         if keydict["heal"]:
             if p1.health<=2:
@@ -906,23 +674,22 @@ while True:
                     minerala-=35
                     if p1.health==2:
                         p1.str=""
-                
+        indexdelete=0
         for i in range(len(l_background)):
-            if l_background[r].y >= HEIGHT:
-                del l_background[r]
-                r-=1
-            r+=1
-        
+            if l_background[indexdelete].y >= HEIGHT:
+                del l_background[indexdelete]
+                indexdelete-=1
+            indexdelete+=1
         #asteroids
         for i in range(len(l_asteroids)):
             if l_asteroids[i].strana==0:
                 l_asteroids[i].draw(window)
-        r = 0
+        indexdelete = 0
         for i in range(len(l_asteroids)):
-            if l_asteroids[r].y >= HEIGHT:
-                del l_asteroids[r]
-                r-=1
-            r+=1
+            if l_asteroids[indexdelete].y >= HEIGHT:
+                del l_asteroids[indexdelete]
+                indexdelete-=1
+            indexdelete+=1
             
         err = 0
         for i in range(len(l_asteroids)):
@@ -969,6 +736,25 @@ while True:
                         for ii in range(10):
                             part.spawn(2,l_l[i].x+l_l[i].width/2,l_l[i].y+l_l[i].height/2,random.randint(10,60),-1,HEIGHT/180,(random.randint(17, 77),random.randint(205, 255),random.randint(186,246)),random.randint(70, 150),1,random.randint(0,40))
                         l_asteroids[j].alive-=info['damage']
+        for i in range(len(l_drones)):
+            l_drones[i].general(window)
+        #for i in range(len(l_drones)):
+        #    for j in range(len(l_l)):
+                
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         
@@ -997,8 +783,6 @@ while True:
                                 l_e.append(e)
                         gm=Green_Mineral(boss.x+boss.width/2,boss.y,HEIGHT/306)
                         break
-        
-        
         err=0
         for i in range(len(l_wingcannons)):
             if l_wingcannons[err].alive==True:
@@ -1007,15 +791,6 @@ while True:
                 del l_wingcannons[err]
                 err-=1
             err+=1
-    
-        
-        
-        
-        
-        
-        
-        
-        
         err = 0
         for i in range(len(l_asteroids)):
             if l_asteroids[err].alive <= 0:
@@ -1023,10 +798,10 @@ while True:
                     prob_powerup= random.randint(1,15)
                     if prob_powerup==1:
                         p=Power_up(l_asteroids[err].x,l_asteroids[err].y,"rb")
-                        l_p.append(p)
+                        l_powerup.append(p)
                     elif prob_powerup==2:
                         p=Power_up(l_asteroids[err].x,l_asteroids[err].y,"db")
-                        l_p.append(p)
+                        l_powerup.append(p)
                     else:
                         m = Mineral(l_asteroids[err].x,l_asteroids[err].y,HEIGHT/306)
                         l_m.append(m)
@@ -1076,25 +851,25 @@ while True:
         for i in range(len(l_asteroids)):
             if l_asteroids[i].strana==1:
                 l_asteroids[i].draw(window)
-        r = 0
+        indexdelete = 0
         for i in range(len(l_asteroids)):
-            if l_asteroids[r].y >= HEIGHT:
-                del l_asteroids[r]
-                r-=1
-            r+=1
+            if l_asteroids[indexdelete].y >= HEIGHT:
+                del l_asteroids[indexdelete]
+                indexdelete-=1
+            indexdelete+=1
         
         
         
         i=0
-        for j in range(len(l_p)):
-            l_p[i].move_and_draw(window)
-            if collision1(pygame.Rect(l_p[i].x,l_p[i].y,l_p[i].width,l_p[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
-                if l_p[i].link=="db":
+        for j in range(len(l_powerup)):
+            l_powerup[i].move_and_draw(window)
+            if collision1(pygame.Rect(l_powerup[i].x,l_powerup[i].y,l_powerup[i].width,l_powerup[i].height),pygame.Rect(p1.x,p1.y,p1.width,p1.height)):
+                if l_powerup[i].link=="db":
                     p1.power_db=300
                 else:
                     p1.power_rb=300
                 i-=1
-                del l_p[i+1]
+                del l_powerup[i+1]
             i+=1
         
         
@@ -1193,7 +968,7 @@ while True:
     part.update(prozor,l_attractors)
         
     pygame.display.update()
-    clock.tick(73)
+    clock.tick(60)
     SVAKIH30+=1
     if SVAKIH30==30:
         SVAKIH30=0
