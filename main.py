@@ -57,7 +57,7 @@ window = pygame.display.set_mode((WIDTH,HEIGHT))
 
 
 
-
+from Classes.laser_enemy import *
 from Classes.loader import *
 from Classes.background import *
 from Classes.player import *
@@ -99,6 +99,8 @@ def mainmenu():
     boss.health=75
     boss.shoot=50
     global l_f
+    global l_le
+    l_le=[]
     l_f=[]
     global l_wingcannons
     l_wingcannons=[]
@@ -204,7 +206,7 @@ def win():
 
 whenwin=-1
 
-
+l_le=[]
 buttonscrolltimes=1
 buttonscrollloc=0
 def button_scroll():
@@ -257,7 +259,7 @@ prom(5,lb)
 prom(6,lb)
 prom(7,lb)
 prom(8,lb)
-godmode=False
+godmode=True
 boss.shoot=50
 spawn_background_rate=int(14780/WIDTH)
 render_death_screen=1
@@ -736,11 +738,82 @@ while True:
                         for ii in range(10):
                             part.spawn(2,l_l[i].x+l_l[i].width/2,l_l[i].y+l_l[i].height/2,random.randint(10,60),-1,HEIGHT/180,(random.randint(17, 77),random.randint(205, 255),random.randint(186,246)),random.randint(70, 150),1,random.randint(0,40))
                         l_asteroids[j].alive-=info['damage']
+
+
+
+
         for i in range(len(l_drones)):
             l_drones[i].general(window)
-        #for i in range(len(l_drones)):
-        #    for j in range(len(l_l)):
-                
+            if l_drones[i].shoot==0:
+                l_le.append(Laser_enemy(l_drones[i].x+l_drones[i].width/2,l_drones[i].y+l_drones[i].height))
+                l_drones[i].shoot=random.randint(180,240)
+        
+        
+        err=0
+        for i in range(len(l_le)):
+            l_le[err].general(window)
+            if l_le[err].x>=p1.x-l_le[err].width and l_le[err].x<=p1.x+p1.width and l_le[err].y>=p1.y-l_le[err].height and l_le[err].y<=p1.y+p1.height:
+                if p1.health!=1:
+                    if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width-p1.height/2.15,p1.height),pygame.Rect(l_le[err].x,l_le[err].y,l_le[err].width,l_le[err].height)):
+                        if p1.health==2:
+                            if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.height/5.608695652173913,p1.height),pygame.Rect(l_le[err].x,l_le[err].y,l_le[err].width,l_le[err].height)):
+                                p1.str="l"
+                            elif collision1(pygame.Rect(p1.x+p1.height/2.433962264150943,p1.y,p1.height/5.608695652173913,p1.height),pygame.Rect(l_le[err].x,l_le[err].y,l_le[err].width,l_le[err].height)):
+                                p1.str="c"
+                            else:
+                                p1.str="r"
+                        if godmode:
+                            p1.health-=1
+                        l_le[err].alive=0
+                else:
+                    if p1.str=="l":
+                        if collision1(pygame.Rect(p1.x,p1.y,p1.width-p1.height/4.3,p1.height),pygame.Rect(l_le[err].x,l_le[err].y,l_le[err].width,l_le[err].height)):
+                            if godmode:
+                                p1.health-=1 
+                            l_le[err].alive=0
+                    elif p1.str=="r":
+                        if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width,p1.height),pygame.Rect(l_le[err].x,l_le[err].y,l_le[err].width,l_le[err].height)):
+                            if godmode:
+                                p1.health-=1
+                            l_le[err].alive=0
+                    else:
+                        if collision1(pygame.Rect(p1.x+p1.height/4.3,p1.y,p1.width-p1.height/2.15,p1.height),pygame.Rect(l_le[err].x,l_le[err].y,l_le[err].width,l_le[err].height)):
+                            if godmode:
+                                p1.health-=1
+                            l_le[err].alive=0
+           
+            if l_le[err].alive==False:
+                del l_le[err]
+                err-=1
+            err+=1
+        
+        
+        
+        
+        
+        
+        
+        for i in range(len(l_drones)):
+            for j in range(len(l_l)):
+                if collision1(pygame.Rect(l_drones[i].x,l_drones[i].y,l_drones[i].width,l_drones[i].height),pygame.Rect(l_l[j].x,l_l[j].y,l_l[j].width,l_l[j].height)):
+                    if l_drones[i].health>0 and l_l[j].health>0:
+                        l_drones[i].health-=info['damage']
+                        l_l[j].health=0
+                        for ii in range(10):
+                            part.spawn(2,l_l[j].x+l_l[j].width/2,l_l[j].y+l_l[j].height/2,random.randint(10,60),-1,HEIGHT/180,(random.randint(17, 77),random.randint(205, 255),random.randint(186,246)),random.randint(70, 150),1,random.randint(0,40))
+        for i in range(len(l_wingcannons)):
+            for j in range(len(l_drones)):
+                if collision1(pygame.Rect(l_wingcannons[i].x,l_wingcannons[i].y,l_wingcannons[i].width,l_wingcannons[i].height),pygame.Rect(l_drones[j].x,l_drones[j].y,l_drones[j].width,l_drones[j].height)):
+                    l_drones[j].health-=3
+                    for ii in range(10):
+                        part.spawn(2,l_drones[j].x+l_drones[j].width/2,l_drones[j].y+l_drones[j].height/2,random.randint(10,60),-1,HEIGHT/180,(random.randint(113, 173),random.randint(100, 160),random.randint(3,63)),random.randint(70, 150),1,random.randint(0,40))
+                    l_wingcannons[i].alive=False
+        indexdelete=0
+        for i in range(len(l_drones)):
+            if l_drones[indexdelete].health<=0:
+                del l_drones[indexdelete]
+                indexdelete-=1
+            indexdelete+=1
         
         
         

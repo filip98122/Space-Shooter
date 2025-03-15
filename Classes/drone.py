@@ -1,6 +1,7 @@
 import pygame
 pygame.init()
 WIDTH,HEIGHT=1540,900
+import random
 from Classes.loader import *
 class Drone:
     def __init__(s,x,y,str):
@@ -14,9 +15,11 @@ class Drone:
         s.speed*=str
         s.str=str
         s.health=10
+        s.shoot=random.randint(240,300)
         s.xo=s.x
     def general(s,window):
         window.blit(s.scaled_img,(s.x,s.y))
+        s.shoot-=1
         if s.str==1:
             if s.x<s.xo+WIDTH:
                 s.x+=s.speed
