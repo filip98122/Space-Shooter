@@ -1,10 +1,5 @@
-import pygame
-pygame.init()
-import math
 from Classes.player import *
-WIDTH,HEIGHT=1540,900
 from Classes.loader import *
-
 class Laser:
     def __init__(s,x,health,angle,p1,str=0,y=p1.y):
         s.x = x

@@ -1,7 +1,3 @@
-import pygame
-import random
-pygame.init()
-WIDTH,HEIGHT=1540,900
 from Classes.loader import *
 class Asteroid:
     def __init__(s,x,y,alive):

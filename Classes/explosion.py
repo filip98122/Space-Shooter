@@ -1,5 +1,3 @@
-import pygame
-pygame.init()
 from Classes.loader import *
 class Explosion:
     def __init__(s,x,y,w,h,time,ss):

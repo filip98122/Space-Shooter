@@ -1,10 +1,4 @@
-import pygame
-pygame.init()
-WIDTH,HEIGHT = 1540,900
-
-
-
-
+from Classes.loader import *
 class Store:
     def __init__(s,x,y,index,text,cost,quantity,op):
         s.x =x

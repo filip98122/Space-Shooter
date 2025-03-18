@@ -1,12 +1,4 @@
-import pygame
-from cryptography.fernet import Fernet
-pygame.init()
-import math
-pygame.mixer.init()
-keys = pygame.key.get_pressed()
-keyE = b'nL5cTPi0324Gk2zgRDR6E4Y2iVHfWnrKu4kGzcB1ZnU='
-import json
-pygame.init()
+from General_info import *
 from Classes.particle_and_particle_system import *
 from Classes.player import *
 from Classes.boss import *

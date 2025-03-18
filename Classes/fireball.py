@@ -1,7 +1,3 @@
-import pygame
-pygame.init()
-import math
-WIDTH,HEIGHT=1540,900
 from Classes.loader import *
 def Vector_Normalization(x1, y1, x2, y2):
     # Calculate dx and dy with direction

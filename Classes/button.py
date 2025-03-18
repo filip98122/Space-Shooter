@@ -1,5 +1,3 @@
-import pygame
-pygame.init()
 from Classes.loader import *
 class Button:
     def __init__(s,x,y,img,text,font,prozor,scale,scale1):

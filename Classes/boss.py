@@ -1,7 +1,4 @@
-import pygame
-pygame.init()
 from Classes.fireball import *
-WIDTH,HEIGHT=1540,900
 from Classes.loader import *
 class Boss:
     def __init__(s,x,y):
@@ -21,7 +18,7 @@ class Boss:
         window.blit(s.scaled_img,(s.x,s.y))
         if s.shoot==0:
             s.make_fireball(l_f,p1)
-            s.shoot=50
+            s.shoot=100
         else:
             s.shoot-=1
     def make_fireball(s,l_f,p1):

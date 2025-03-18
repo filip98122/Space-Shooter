@@ -1,6 +1,3 @@
-import pygame
-pygame.init()
-WIDTH,HEIGHT=1540,900
 from Classes.loader import *
 class Wing_cannons:
     def __init__(s,x,y):

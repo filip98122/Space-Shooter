@@ -1,6 +1,3 @@
-import pygame
-pygame.init()
-WIDTH,HEIGHT=1540,900
 from Classes.loader import *
 class Power_up:
     def __init__(s,x,y,vrsta):

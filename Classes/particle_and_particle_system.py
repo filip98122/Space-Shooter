@@ -1,9 +1,4 @@
-import pygame
-import random
-pygame.init()
-WIDTH,HEIGHT=1540,900
 from Classes.attractor import *
-import math
 class Particle:
     def __init__(s,x,y,lifetime,dx,dy,radius,color,alpha,prozor,delay):
         s.x=x

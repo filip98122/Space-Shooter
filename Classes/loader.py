@@ -1,8 +1,4 @@
-import pygame
-import random
-from cryptography.fernet import Fernet
-pygame.init()
-WIDTH,HEIGHT=1540,900
+from General_info import *
 class Loader():
     def load(s):
         loaded={}
@@ -33,6 +29,7 @@ class Loader():
         loaded[28]=pygame.image.load("textures/bullet.png")
         loaded[29]=pygame.transform.flip(pygame.image.load("textures/drone.png"),False,True)
         loaded[30]=pygame.transform.rotate(pygame.image.load("textures/laser_enemy.png"),270)
+        loaded[31]=pygame.image.load("textures/frame.png")
         
         loaded['asteroid1']=s.image1
         loaded['asteroid2']=s.image2
