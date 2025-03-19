@@ -229,8 +229,8 @@ prom(5,lb)
 prom(6,lb)
 prom(7,lb)
 prom(8,lb)
-godmode=True
-boss.shoot=50
+godmode=False
+boss.shoot=100
 spawn_background_rate=int(14780/WIDTH)
 render_death_screen=1
 ukupnom=info["minerala"]
